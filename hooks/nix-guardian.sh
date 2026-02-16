@@ -4,7 +4,6 @@ set -euo pipefail
 input=$(cat)
 command=$(echo "$input" | jq -r '.tool_input.command // empty')
 
-# Match bare build/install tool invocations that should go through nix
 if echo "$command" | grep -qE '^(cargo build|cargo install|cargo run|npm install|npm run|yarn |pnpm |pip install|pip3 install|make($| )|cmake |gcc |g\+\+ |clang )'; then
   jq -n '{
     hookSpecificOutput: {

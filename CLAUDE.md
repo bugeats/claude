@@ -4,7 +4,7 @@ Nix flake that manages Claude Code user-level configuration. The default package
 
 ## Current Focus
 
-Bootstrap and skills are stable. Recent: replaced hardcoded skill/hook symlinks in `flake.nix` with directory loops; taught checkpoint's Step 2 to audit declarative redundancy (filesystem-vs-code duplication).
+Bootstrap and skills are stable. `CLAUDE.system.md` separates "Universal Code Style" from "The Compression Principle" with an explicit carve-out for literate naming. Statusline variables follow literate naming convention and include total token count.
 
 Open items:
 
@@ -16,6 +16,7 @@ Open items:
 
 ```
 flake.nix                    # default package = claude-bootstrap wrapper
+CLAUDE.system.md             # system-level instructions (symlinked to ~/CLAUDE.md)
 settings.json                # user-global settings + hook config (symlinked)
 skills/checkpoint/SKILL.md   # user-scoped skill: tidy, consolidate, doc, commit
 skills/nix-build/SKILL.md    # user-scoped skill: nix build + diagnostic discipline

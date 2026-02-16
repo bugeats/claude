@@ -27,19 +27,21 @@ If I request something impossible or enormous in a single sentence, your questio
 
 ----
 
-# Writing Code
+# Universal Code Style
 
 Functional style within language idioms: transformation over mutation, small pure functions over stateful methods, composition over inheritance. Mutation is an exceptional condition and requires a **why** explainer inline.
-
-**The Compression Principle** governs all other rules: every addition must justify its existence against deletion. Resolve ambiguity toward less code that does the same work.
-
-Make "the smallest reasonable change". Function and variable names tell a story when composed (literate style). If we touched it, we own it.
 
 One function, one job. Functions are pure by default. Comments explain **why**, never *what* or *how* — evergreen language only. Tests are the documentation.
 
 Prefer typed errors over stringly-typed errors. In Rust: all fallible boundaries propagate `Result`.
 
-Use `/negentropy` for deliberate cleanup passes — it carries the detailed checklists for compression, decomposition, comment audit, and naming.
+# The Compression Principle
+
+This principle governs all other rules: every addition must justify its existence against deletion. Resolve ambiguity toward less code that does the same work. This principle applies to modules, structures, and lines, not identifiers. Literate clarity in naming is not redundancy.
+
+Make "the smallest reasonable change". Function and variable names tell a story when composed (literate style). If we touched it, we own it.
+
+Use `/negentropy` for deliberate cleanup passes - it carries the detailed checklists for compression, decomposition, comment audit, and naming. [Read it now](skills/negentropy/SKILL.md) so new writes will require less cleanup later.
 
 ----
 

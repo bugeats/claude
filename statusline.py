@@ -6,12 +6,13 @@ data = json.load(sys.stdin)
 
 model = data.get("model", {}).get("display_name", "?")
 
-ctx = data.get("context_window", {})
-pct = int(ctx.get("used_percentage", 0))
-filled = pct // 10
-bar = "\u2593" * filled + "\u2591" * (10 - filled)
-in_tok = ctx.get("total_input_tokens", 0)
-out_tok = ctx.get("total_output_tokens", 0)
+context_window = data.get("context_window", {})
+percentage = int(context_window.get("used_percentage", 0))
+filled = percentage // 10
+progress_bar = "\u2593" * filled + "\u2591" * (10 - filled)
+tok_input_count = context_window.get("total_input_tokens", 0)
+tok_output_count = context_window.get("total_output_tokens", 0)
+tok_total_count = tok_input_count + tok_output_count
 
 cost = data.get("cost", {})
 dollars = cost.get("total_cost_usd", 0) or 0
@@ -20,7 +21,7 @@ added = cost.get("total_lines_added", 0) or 0
 removed = cost.get("total_lines_removed", 0) or 0
 
 
-def fmt_tokens(n):
+def format_tokens(n):
     if n >= 1_000_000:
         return f"{n / 1_000_000:.1f}M"
     if n >= 1_000:
@@ -28,7 +29,7 @@ def fmt_tokens(n):
     return str(n)
 
 
-def fmt_duration(ms):
+def format_duration(ms):
     s = int(ms // 1000)
     m, s = divmod(s, 60)
     h, m = divmod(m, 60)
@@ -38,9 +39,9 @@ def fmt_duration(ms):
 
 
 parts = [
-    f"{model} {bar} {pct}% (▲{fmt_tokens(in_tok)} ▼{fmt_tokens(out_tok)})",
+    f"{model} {progress_bar} {percentage}% ▲{format_tokens(tok_input_count)} ▼{format_tokens(tok_output_count)} ({format_tokens(tok_total_count)})",
     f"${dollars:.2f}",
-    fmt_duration(duration_ms),
+    format_duration(duration_ms),
     f"+{added}-{removed}",
 ]
 

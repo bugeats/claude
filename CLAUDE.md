@@ -6,7 +6,7 @@ Nix flake that manages Claude Code user-level configuration. The default package
 
 ## Current Focus
 
-Bootstrap, skills, and system instructions are stable. No active feature work — open items below are the next candidates.
+Bootstrap greeting banner uses the **miniwi** figlet font (fetched via `pkgs.fetchurl`, hash-pinned) for a compact Unicode block-character aesthetic. `figlet -f <miniwi-store-path>` + `tte slide` displays the user's name on every launch. Per-user identity prompts on first run.
 
 Open items:
 
@@ -29,9 +29,9 @@ hooks/nix-format.sh          # PostToolUse hook: nixfmt via nix run (symlinked)
 hooks/nix-guardian.sh        # PreToolUse hook: prompt before non-nix build commands (symlinked)
 ```
 
-**Authored vs runtime**: the bootstrap script loops over `skills/*/` and `hooks/*.sh` — adding a skill or hook directory is sufficient; no manifest update needed. Everything else in `~/.claude/` (projects, history, sessions, cache, store.db) is mutable runtime state left unmanaged.
+**Authored vs runtime**: the bootstrap script loops over `skills/*/` and `hooks/*.sh` — adding a skill or hook directory is sufficient; no manifest update needed. `~/.claude/identity` is created on first run (user-prompted, defaults to `whoami`) and read by Claude at session start for personalized address. Everything else in `~/.claude/` (projects, history, sessions, cache, store.db) is mutable runtime state left unmanaged.
 
-**Dependencies**: all runtime binaries (`claude`, `jq`, `grep`, `git`, `rg`, `coreutils`, `python3`) are declared in `flake.nix` `runtimeInputs` — no ambient PATH assumptions. Formatting runs `nixfmt-rfc-style` ephemerally via `nix run nixpkgs#nixfmt-rfc-style`.
+**Dependencies**: all runtime binaries (`claude`, `jq`, `grep`, `git`, `rg`, `coreutils`, `python3`, `figlet`, `tte`) are declared in `flake.nix` `runtimeInputs` — no ambient PATH assumptions. The miniwi figlet font is fetched via `pkgs.fetchurl` (hash-pinned, source: `xero/figlet-fonts`). Formatting runs `nixfmt-rfc-style` ephemerally via `nix run nixpkgs#nixfmt-rfc-style`.
 
 ## Commands
 

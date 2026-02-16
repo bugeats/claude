@@ -31,6 +31,10 @@
             config.allowUnfree = true;
           };
           claude-code = claude-code-overlay.packages.${system}.claude;
+          miniwi-font = pkgs.fetchurl {
+            url = "https://raw.githubusercontent.com/xero/figlet-fonts/main/miniwi.flf";
+            hash = "sha256-t9cGfmVdIEbU5sldhMOGMYxh4mFCWLGBfaCtvvZw/dk=";
+          };
         in
         {
           default = pkgs.writeShellApplication {
@@ -43,10 +47,27 @@
               pkgs.git
               pkgs.ripgrep
               pkgs.python3
+              pkgs.figlet
+              pkgs.terminaltexteffects
             ];
             text = ''
               config_dir="$HOME/.claude"
               mkdir -p "$config_dir/skills" "$config_dir/hooks"
+
+              # first-run identity prompt — persists across ephemeral nix run invocations
+              identity_file="$config_dir/identity"
+              if [ ! -f "$identity_file" ]; then
+                default_name="$(whoami)"
+                printf "How should Claude address you? [%s]: " "$default_name"
+                read -r user_name
+                user_name="''${user_name:-$default_name}"
+                echo "$user_name" > "$identity_file"
+              fi
+
+              # greeting banner
+              user_name=$(cat "$identity_file")
+              clear
+              figlet -f "${miniwi-font}" "$user_name ships clean code" | tte slide
 
               ln -sf "${self}/settings.json" "$config_dir/settings.json"
               for skill in "${self}"/skills/*/; do

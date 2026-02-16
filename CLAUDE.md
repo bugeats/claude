@@ -2,9 +2,11 @@
 
 Nix flake that manages Claude Code user-level configuration. The default package (`claude-bootstrap`) symlinks authored config into `~/.claude/` and execs `claude`.
 
+**Self-referential repo**: `CLAUDE.system.md` is symlinked to `~/CLAUDE.md`, which Claude Code loads as system-level instructions for every session. When working in this project, you are editing the instructions that govern you. Changes to `CLAUDE.system.md` take effect on next session start.
+
 ## Current Focus
 
-Bootstrap and skills are stable. `CLAUDE.system.md` separates "Universal Code Style" from "The Compression Principle" with an explicit carve-out for literate naming. Statusline variables follow literate naming convention and include total token count.
+Bootstrap, skills, and system instructions are stable. No active feature work — open items below are the next candidates.
 
 Open items:
 

@@ -35,13 +35,17 @@ One function, one job. Functions are pure by default. Comments explain **why**, 
 
 Prefer typed errors over stringly-typed errors. In Rust: all fallible boundaries propagate `Result`.
 
+----
+
 # The Compression Principle
 
-This principle governs all other rules: every addition must justify its existence against deletion. Resolve ambiguity toward less code that does the same work. This principle applies to modules, structures, and lines, not identifiers. Literate clarity in naming is not redundancy.
+The compression principle governs all other rules: **every addition must justify its existence against deletion**. Resolve ambiguity toward less code that does the same work. The principle applies to modules, structures, and lines, not identifiers. Literate clarity in naming is not redundancy, and the compression is in the _meaning_.
 
-Make "the smallest reasonable change". Function and variable names tell a story when composed (literate style). If we touched it, we own it.
+Make "the smallest reasonable change". Function and variable names tell a story when composed (literate style).
 
-Use `/negentropy` for deliberate cleanup passes - it carries the detailed checklists for compression, decomposition, comment audit, and naming. [Read it now](skills/negentropy/SKILL.md) so new writes will require less cleanup later.
+If we touched a file, we now own it and are responsible for its compression maintenance.
+
+Use `/negentropy` for deliberate cleanup passes. [Read this skill](skills/negentropy/SKILL.md) so new writes will require less cleanup later.
 
 ----
 
@@ -75,8 +79,16 @@ When a checkpoint triggers, invoke `/checkpoint`.
 
 # Working With Nix
 
-This is a NixOS system. Nix is the default build tool — only escalate if you hit a specific limitation, and explain why. Use `/nix-build` for the primary debug loop. Files must be `git add`ed before `nix build` — flakes only see tracked files.
+This is a NixOS system. Nix is the default build tool — only escalate if you hit a specific limitation, and explain why.
 
-`flake.nix` is the single source of runtime environment. All binaries that scripts or hooks require must be declared in `runtimeInputs`. Never assume a tool exists on ambient PATH.
+Use `/nix-build` for the primary debug loop. [Read this skill](skills/nix-build/SKILL.md) so you are prepared to use it.
+
+Files must be `git add`ed before `nix build` — flakes only see tracked files.
+
+`flake.nix` is the single source of runtime environment. All binaries that scripts or hooks require must be declared as input dependencies. Never assume a tool exists on ambient PATH.
+
+If you reach for a tool and it's not available, stop and add it to the `flake.nix` dependencies.
+
+----
 
 You have now been initiated.

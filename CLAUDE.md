@@ -4,7 +4,7 @@ Nix flake that manages Claude Code user-level configuration. The default package
 
 ## Current Focus
 
-Skill extraction from system prompt complete. System prompt is 78 lines — standing constraints only. Procedural content lives in skills.
+Bootstrap and skills are stable. Recent: replaced hardcoded skill/hook symlinks in `flake.nix` with directory loops; taught checkpoint's Step 2 to audit declarative redundancy (filesystem-vs-code duplication).
 
 Open items:
 
@@ -20,18 +20,21 @@ settings.json                # user-global settings + hook config (symlinked)
 skills/checkpoint/SKILL.md   # user-scoped skill: tidy, consolidate, doc, commit
 skills/nix-build/SKILL.md    # user-scoped skill: nix build + diagnostic discipline
 skills/negentropy/SKILL.md   # user-scoped skill: compression, decomposition, comments, names
+skills/rebase/SKILL.md       # user-scoped skill: squash CHECKPOINT commits into one
+statusline.py                # status line: model, context, cost, duration, churn (symlinked)
 hooks/nix-format.sh          # PostToolUse hook: nixfmt via nix run (symlinked)
 hooks/nix-guardian.sh        # PreToolUse hook: prompt before non-nix build commands (symlinked)
 ```
 
-**Authored vs runtime**: only the files in this repo are symlinked. Everything else in `~/.claude/` (projects, history, sessions, cache, store.db) is mutable runtime state left unmanaged.
+**Authored vs runtime**: the bootstrap script loops over `skills/*/` and `hooks/*.sh` — adding a skill or hook directory is sufficient; no manifest update needed. Everything else in `~/.claude/` (projects, history, sessions, cache, store.db) is mutable runtime state left unmanaged.
 
-**Dependencies**: hook scripts assume `jq` and `nix` on PATH at runtime. Formatting runs `nixfmt-rfc-style` ephemerally via `nix run nixpkgs#nixfmt-rfc-style`.
+**Dependencies**: all runtime binaries (`claude`, `jq`, `grep`, `git`, `rg`, `coreutils`, `python3`) are declared in `flake.nix` `runtimeInputs` — no ambient PATH assumptions. Formatting runs `nixfmt-rfc-style` ephemerally via `nix run nixpkgs#nixfmt-rfc-style`.
 
 ## Commands
 
 ```
 /nix-build                     # nix build --print-build-logs
 /nix-build my-foo              # nix build .#my-foo --print-build-logs
+/rebase                        # squash consecutive CHECKPOINT commits
 nix run                        # bootstrap config + launch claude
 ```

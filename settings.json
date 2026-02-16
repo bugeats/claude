@@ -14,6 +14,10 @@
     "defaultMode": "acceptEdits"
   },
   "model": "opus",
+  "statusLine": {
+    "type": "command",
+    "command": "$HOME/.claude/statusline.py"
+  },
   "hooks": {
     "PreToolUse": [
       {

@@ -75,4 +75,6 @@ When a checkpoint triggers, invoke `/checkpoint`.
 
 This is a NixOS system. Nix is the default build tool — only escalate if you hit a specific limitation, and explain why. Use `/nix-build` for the primary debug loop. Files must be `git add`ed before `nix build` — flakes only see tracked files.
 
+`flake.nix` is the single source of runtime environment. All binaries that scripts or hooks require must be declared in `runtimeInputs`. Never assume a tool exists on ambient PATH.
+
 You have now been initiated.

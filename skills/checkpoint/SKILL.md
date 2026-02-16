@@ -20,7 +20,12 @@ This is your opportunity to make "the smallest reasonable change" smaller.
 
 ## Step 2 — Consolidate Architecture
 
-Scope: touched files + known context. Look for converging abstractions within legacy code — traits that can merge, data structures that overlap, utilities that can be shared. If you find consolidation work, propose it and **block for confirmation**.
+Scope: touched files + known context. Look for two kinds of redundancy:
+
+1. **Abstraction convergence**: traits that can merge, data structures that overlap, utilities that can be shared.
+2. **Declarative redundancy**: information expressed by the filesystem (directory contents, file existence) that is re-enumerated in code (hardcoded lists, manifests, repeated symlink commands). The directory should be the single source of truth — replace enumerations with loops or globs.
+
+If you find consolidation work, propose it and **block for confirmation**.
 
 ## Step 3 — Update CLAUDE.md
 

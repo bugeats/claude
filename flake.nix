@@ -2,11 +2,17 @@
   description = "Claude Code configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1";
+    claude-code-overlay.url = "github:ryoppippi/claude-code-overlay";
+    claude-code-overlay.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
-    { self, nixpkgs }:
+    {
+      self,
+      nixpkgs,
+      claude-code-overlay,
+    }:
     let
       systems = [
         "x86_64-linux"
@@ -20,25 +26,41 @@
       packages = eachSystem (
         system:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+          };
+          claude-code = claude-code-overlay.packages.${system}.claude;
         in
         {
-          default = pkgs.writeShellScriptBin "claude-bootstrap" ''
-            set -euo pipefail
+          default = pkgs.writeShellApplication {
+            name = "claude-bootstrap";
+            runtimeInputs = [
+              claude-code
+              pkgs.jq
+              pkgs.gnugrep
+              pkgs.coreutils
+              pkgs.git
+              pkgs.ripgrep
+              pkgs.python3
+            ];
+            text = ''
+              config_dir="$HOME/.claude"
+              mkdir -p "$config_dir/skills" "$config_dir/hooks"
 
-            config_dir="$HOME/.claude"
-            mkdir -p "$config_dir/skills" "$config_dir/hooks"
+              ln -sf "${self}/settings.json" "$config_dir/settings.json"
+              for skill in "${self}"/skills/*/; do
+                ln -sfn "$skill" "$config_dir/skills/$(basename "$skill")"
+              done
+              ln -sf "${self}/statusline.py" "$config_dir/statusline.py"
+              for hook in "${self}"/hooks/*.sh; do
+                ln -sf "$hook" "$config_dir/hooks/$(basename "$hook")"
+              done
+              ln -sf "${self}/CLAUDE.system.md" "$HOME/CLAUDE.md"
 
-            ln -sf "${self}/settings.json" "$config_dir/settings.json"
-            ln -sfn "${self}/skills/negentropy" "$config_dir/skills/negentropy"
-            ln -sfn "${self}/skills/checkpoint" "$config_dir/skills/checkpoint"
-            ln -sfn "${self}/skills/nix-build" "$config_dir/skills/nix-build"
-            ln -sf "${self}/hooks/nix-format.sh" "$config_dir/hooks/nix-format.sh"
-            ln -sf "${self}/hooks/nix-guardian.sh" "$config_dir/hooks/nix-guardian.sh"
-            ln -sf "${self}/CLAUDE.system.md" "$HOME/CLAUDE.md"
-
-            exec claude "$@"
-          '';
+              exec claude "$@"
+            '';
+          };
         }
       );
     };

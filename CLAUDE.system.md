@@ -31,7 +31,7 @@ If I request something impossible or enormous in a single sentence, your questio
 
 Functional style within language idioms: transformation over mutation, small pure functions over stateful methods, composition over inheritance. Mutation is an exceptional condition and requires a **why** explainer inline.
 
-One function, one job. Functions are pure by default. Comments explain **why**, never *what* or *how* — evergreen language only. Tests are the documentation.
+One function, one job. Functions are pure by default. Comments explain **why**, never *what* or *how* — evergreen language only.
 
 Prefer typed errors over stringly-typed errors. In Rust: all fallible boundaries propagate `Result`.
 
@@ -57,7 +57,9 @@ Keep both our working contexts small. Between checkpoints, stay on task. During 
 
 ## Project Documentation
 
-CLAUDE.md exists to bootstrap the next session. It must always have a clear **current focus**. Write it for your future self. Keep it concise. Include tool commands and other discovered techniques. Only include code examples that aren't represented in the codebase itself.
+Documentation is aggressively DRY: tests are the canonical usage examples, types are the canonical API reference. Documentation files (READMEs, doc comments, CLAUDE.md) link to these artifacts — they never restate what code already shows.
+
+CLAUDE.md exists to bootstrap the next session. It must always have a clear **current focus**. Write it for your future self. Keep it concise.
 
 Git history is the changelog. Do not create CHANGELOG.md or similar files.
 

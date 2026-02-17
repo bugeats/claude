@@ -6,10 +6,11 @@ Nix flake that manages Claude Code user-level configuration. The default package
 
 ## Current Focus
 
-Bootstrap greeting banner uses the **miniwi** figlet font (fetched via `pkgs.fetchurl`, hash-pinned) for a compact Unicode block-character aesthetic. `figlet -f <miniwi-store-path>` + `tte slide` displays the user's name on every launch. Per-user identity prompts on first run.
+Status line styling (`statusline.py`): matching the Claude Code TUI aesthetic. Pipe separators and ANSI color (including 24-bit for brand purple `#B388FF`) are in place. Context percentage uses threshold coloring (green/yellow/red). Status line supports full ANSI escapes including 24-bit RGB.
 
 Open items:
 
+- **Color tuning**: Brand purple `#B388FF` is approximate — verify against actual Claude Code TUI source if possible.
 - **settings.json write-back**: Claude writes `feedbackSurveyState` to settings.json. Symlink to read-only store path may fail — may require copy-with-merge strategy.
 - **Hook verification**: `$HOME` expansion in hook command path untested. Hook stdin JSON schema (`tool_input.command`, `tool_input.file_path`) confirmed via docs but not verified at runtime.
 - **System flake integration**: Flake designed for both `nix run github:bugeats/claude` and inclusion in a system flake via `packages.default`. Neither path tested end-to-end.

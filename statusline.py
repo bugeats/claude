@@ -12,7 +12,6 @@ filled = percentage // 10
 progress_bar = "\u2593" * filled + "\u2591" * (10 - filled)
 tok_input_count = context_window.get("total_input_tokens", 0)
 tok_output_count = context_window.get("total_output_tokens", 0)
-tok_total_count = tok_input_count + tok_output_count
 
 cost = data.get("cost", {})
 dollars = cost.get("total_cost_usd", 0) or 0
@@ -38,11 +37,27 @@ def format_duration(ms):
     return f"{m}m{s:02d}s"
 
 
+RESET = "\033[0m"
+DIM = "\033[2m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+RED = "\033[31m"
+PURPLE = "\033[38;2;179;136;255m"  # #B388FF — Claude brand accent
+
+if percentage >= 90:
+    pct_color = RED
+elif percentage >= 70:
+    pct_color = YELLOW
+else:
+    pct_color = GREEN
+
+sep = f" {DIM}|{RESET} "
+
 parts = [
-    f"{model} {progress_bar} {percentage}% ▲{format_tokens(tok_input_count)} ▼{format_tokens(tok_output_count)} ({format_tokens(tok_total_count)})",
+    f"{PURPLE}{model}{RESET} {progress_bar} {pct_color}{percentage}%{RESET} {DIM}▲{RESET}{format_tokens(tok_input_count)} {DIM}▼{RESET}{format_tokens(tok_output_count)}",
     f"${dollars:.2f}",
     format_duration(duration_ms),
-    f"+{added}-{removed}",
+    f"{GREEN}+{added}{RESET}{RED}-{removed}{RESET}",
 ]
 
-print("  ".join(parts))
+print(sep.join(parts))

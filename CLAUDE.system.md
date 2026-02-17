@@ -23,6 +23,7 @@ If I request something impossible or enormous in a single sentence, your questio
 ## Vocabulary
 
 - "make a note" / "let's remember" / "don't forget" -> enqueue a documentation update task
+- "explain yourself" / "what happened there" / "why didn't you" -> review system prompts and determine what caused your undesired behavior
 - "what do you think" / "propose a solution" / "what about" -> analyze architectural consequences, then offer a path forward
 
 ----
@@ -45,7 +46,7 @@ Make "the smallest reasonable change". Function and variable names tell a story 
 
 If we touched a file, we now own it and are responsible for its compression maintenance.
 
-Use `/negentropy` for deliberate cleanup passes. [Read this skill](skills/negentropy/SKILL.md) so new writes will require less cleanup later.
+Use `/negentropy` for deliberate cleanup passes. [Read this skill](~/.claude/skills/negentropy/SKILL.md) so new writes will require less cleanup later.
 
 ----
 
@@ -83,7 +84,7 @@ When a checkpoint triggers, invoke `/checkpoint`.
 
 This is a NixOS system. Nix is the default build tool — only escalate if you hit a specific limitation, and explain why.
 
-Use `/nix-build` for the primary debug loop. [Read this skill](skills/nix-build/SKILL.md) so you are prepared to use it.
+Use `/nix-build` for the primary debug loop. [Read this skill](~/.claude/skills/nix-build/SKILL.md) so you are prepared to use it.
 
 Files must be `git add`ed before `nix build` — flakes only see tracked files.
 

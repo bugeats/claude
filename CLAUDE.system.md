@@ -32,7 +32,9 @@ If I request something impossible or enormous in a single sentence, your questio
 
 Functional style within language idioms: transformation over mutation, small pure functions over stateful methods, composition over inheritance. Mutation is an exceptional condition and requires a **why** explainer inline.
 
-One function, one job. Functions are pure by default. Comments explain **why**, never *what* or *how* — evergreen language only.
+One function, one job. Functions are pure by default.
+
+The _Evergreen Rule_: comments explain **why**, never *what* or *how*.
 
 Prefer typed errors over stringly-typed errors. In Rust: all fallible boundaries propagate `Result`.
 
@@ -40,13 +42,61 @@ Prefer typed errors over stringly-typed errors. In Rust: all fallible boundaries
 
 # The Compression Principle
 
-The compression principle governs all other rules: **every addition must justify its existence against deletion**. Resolve ambiguity toward less code that does the same work. The principle applies to modules, structures, and lines, not identifiers. Literate clarity in naming is not redundancy, and the compression is in the _meaning_.
+> Every addition must justify its existence against deletion. This principle governs all other rules. Resolve ambiguity toward less code that does the same work. When in doubt, delete. When not in doubt, challenge your confidence, then delete.
 
-Make "the smallest reasonable change". Function and variable names tell a story when composed (literate style).
+Code that cannot survive this challenge is not clean code that might be removed some day — it is entropy that was never earned.
+
+This principle applies to all text, modules, structures, lines, and functions.
+
+This principle applies to identifiers in a very specific way: literate clarity in naming is not redundancy, it is compressed intent. Identifiers form the nouns and verbs of crystalized meaning.
+
+## Practical Compression
+
+Make "the smallest reasonable change", defined as the narrowest diff that leaves the codebase strictly better. In practice:
+
+- Make inconsequential fixes without asking.
+- Consolidate duplication, simplify logic, decompose where it clarifies.
+- Trim or remove stale comments according to the Evergreen Rule.
+- Consolidate converging abstractions
+  - traits that can merge
+  - data structures that overlap
+  - utilities that can be shared
+- Compress declarative redundancy
+  - Reuse constants
+  - Identify information already expressed by the filesystem (directory contents, file existence)
+  - Replace enumerations with loops or globs.
+
+## Boundaries & Responsibility 
 
 If we touched a file, we now own it and are responsible for its compression maintenance.
 
-Use `/negentropy` for deliberate cleanup passes. [Read this skill](~/.claude/skills/negentropy/SKILL.md) so new writes will require less cleanup later.
+If we import a local module or use a common interface, we have now _added_ to its surface area.
+
+It we depend on an abstraction, we now have an opinion about its design. The Compression Principle makes opinions defensible.
+
+----
+
+# Workflow - The Arcs
+
+Workflow is structured around the concept of a _Bounded Arc_, a cyclic routine and a unit of confidence. This algorithm is designed to structure thinking, reduce entropy, and manage context.
+
+You operate as a suspending scheduler. Work proceeds within two types of arcs, one inside the other, a wheel within a wheel. At the end of each arc, you stop generating and enter evaluation mode.
+
+## Major Arc - Active Negentropy
+
+The Active Negentropy arc creates a boundary for settled features written in clean code. During the Active Negentropy arc, the scope of the Compression Principle goes wide. It is a _compression_ of one or more checkpoint arcs, with each checkpoint embedding scope hints in its commit message.
+
+**Triggers:** a task plan has completed, a feature has landed, checkpoints have accumulated.
+
+When Active Negentropy triggers, invoke `/negentropy`.
+
+## Minor Arc - Checkpoint
+
+The checkpoint arc creates a boundary for aggressive context consolidation: a coherent unit of confidence. Err towards frequent checkpoints. Token budget is not a concern, but when we do this right, we maximize token value.
+
+**Triggers:** a test suite pass, a bug resolved, a function change, a trait implementation, a surprising discovery, a module-level refactor — and you are about to move to the next. If you are uncertain whether you've reached a checkpoint boundary, you have.
+
+When a Checkpoint triggers, invoke `/checkpoint`.
 
 ----
 
@@ -60,9 +110,9 @@ Keep both our working contexts small. Between checkpoints, stay on task. During 
 
 Documentation is aggressively DRY: tests are the canonical usage examples, types are the canonical API reference. Documentation files (READMEs, doc comments, CLAUDE.md) link to these artifacts — they never restate what code already shows.
 
-CLAUDE.md exists to bootstrap the next session. It must always have a clear **current focus**. Write it for your future self. Keep it concise.
+CLAUDE.md exists to bootstrap the next session. It must always have a clear **current focus**. Write it for your future self. The Compression Principle applies.
 
-Git history is the changelog. Do not create CHANGELOG.md or similar files.
+Git history _is_ the changelog. Do not create CHANGELOG.md or similar files.
 
 ## Gathering Context
 
@@ -70,27 +120,21 @@ Ask rather than assume. Search when in doubt.
 
 External source code trumps external documentation - when debugging dependencies, read the source. Capture discoveries in project docs because fetched sources are ephemeral.
 
-## Checkpoints
-
-A checkpoint is a natural pause triggered by: a feature confirmed working, a test suite passing, a completed debug cycle, a surprising discovery that needs analysis, a plan change, or a long-running operation is about to be launched.
-
-Checkpoints create a boundary for aggressive context consolidation: a unit of confidence. Err towards frequent checkpoints. Token budget is not a concern, but when we do this right, we maximize token value.
-
-When a checkpoint triggers, invoke `/checkpoint`.
-
 ----
 
 # Working With Nix
 
 This is a NixOS system. Nix is the default build tool — only escalate if you hit a specific limitation, and explain why.
 
-Use `/nix-build` for the primary debug loop. [Read this skill](~/.claude/skills/nix-build/SKILL.md) so you are prepared to use it.
+Initialize a `flake.nix` if there isn't one already. The flake is the single source of runtime environment. All binaries that scripts or hooks require must be declared as input dependencies. Never assume a tool exists on ambient PATH.
 
-Files must be `git add`ed before `nix build` — flakes only see tracked files.
+Files must be tracked by git before `nix build` can ready them. Use `/checkpoint` to add files.
 
-`flake.nix` is the single source of runtime environment. All binaries that scripts or hooks require must be declared as input dependencies. Never assume a tool exists on ambient PATH.
+If you reach for an external tool and it's not available, stop and add it to the `flake.nix` dependencies.
 
-If you reach for a tool and it's not available, stop and add it to the `flake.nix` dependencies.
+If you find yourself creating a complex tool or repeating a pattern, use `/nix-run <my-command>`. Document your toolset.
+
+Use `/nix-build` for the primary debug loop.
 
 ----
 

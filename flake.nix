@@ -64,16 +64,24 @@
                 echo "$user_name" > "$identity_file"
               fi
 
-              # greeting banner
               user_name=$(cat "$identity_file")
               clear
               figlet -f "${miniwi-font}" "$user_name ships clean code" | tte slide
+              printf '\n  %s\n\n' "This Claude has superpowers. Say /school-me to learn more."
 
               ln -sf "${self}/settings.json" "$config_dir/settings.json"
+              # clean stale skill symlinks that point into the nix store (ours)
+              for existing in "$config_dir"/skills/*/; do
+                [ -L "''${existing%/}" ] && [[ "$(readlink "''${existing%/}")" == /nix/store/* ]] && rm "''${existing%/}"
+              done
               for skill in "${self}"/skills/*/; do
                 ln -sfn "$skill" "$config_dir/skills/$(basename "$skill")"
               done
               ln -sf "${self}/statusline.py" "$config_dir/statusline.py"
+              # clean stale hook symlinks that point into the nix store (ours)
+              for existing in "$config_dir"/hooks/*.sh; do
+                [ -L "$existing" ] && [[ "$(readlink "$existing")" == /nix/store/* ]] && rm "$existing"
+              done
               for hook in "${self}"/hooks/*.sh; do
                 ln -sf "$hook" "$config_dir/hooks/$(basename "$hook")"
               done

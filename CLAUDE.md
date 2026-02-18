@@ -14,12 +14,13 @@ skills/checkpoint/SKILL.md   # user-scoped skill: tidy, consolidate, doc, commit
 skills/nix-build/SKILL.md    # user-scoped skill: nix build + diagnostic discipline
 skills/negentropy/SKILL.md   # user-scoped skill: DCG-driven fixed-point compression + rebase
 skills/nix-run/SKILL.md      # user-scoped skill: run named nix flake app
+skills/school-me/SKILL.md    # user-scoped skill: guided tour of this config's workflow
 statusline.py                # status line: model, context, cost, duration, churn (symlinked)
 hooks/nix-format.sh          # PostToolUse hook: nixfmt via nix run (symlinked)
 hooks/nix-guardian.sh        # PreToolUse hook: prompt before non-nix build commands (symlinked)
 ```
 
-**Authored vs runtime**: the bootstrap script loops over `skills/*/` and `hooks/*.sh` — adding a skill or hook directory is sufficient; no manifest update needed. `~/.claude/identity` is created on first run (user-prompted, defaults to `whoami`) and read by Claude at session start for personalized address. Everything else in `~/.claude/` (projects, history, sessions, cache, store.db) is mutable runtime state left unmanaged.
+**Authored vs runtime**: the bootstrap script loops over `skills/*/` and `hooks/*.sh` — adding or removing a skill/hook directory is sufficient; no manifest update needed. Stale symlinks pointing into the nix store are cleaned on each run; user-authored entries are preserved. `~/.claude/identity` is created on first run (user-prompted, defaults to `whoami`) and read by Claude at session start for personalized address. Everything else in `~/.claude/` (projects, history, sessions, cache, store.db) is mutable runtime state left unmanaged.
 
 **Dependencies**: all runtime binaries (`claude`, `jq`, `grep`, `git`, `rg`, `coreutils`, `python3`, `figlet`, `tte`) are declared in `flake.nix` `runtimeInputs` — no ambient PATH assumptions. The miniwi figlet font is fetched via `pkgs.fetchurl` (hash-pinned, source: `xero/figlet-fonts`). Formatting runs `nixfmt-rfc-style` ephemerally via `nix run nixpkgs#nixfmt-rfc-style`.
 
@@ -33,7 +34,7 @@ nix run                        # bootstrap config + launch claude
 
 ## Current Focus
 
-All prompts and skills stable. No active feature work.
+Bootstrap and onboarding are stable. No active feature work.
 
 Open items:
 

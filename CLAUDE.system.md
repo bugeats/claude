@@ -32,7 +32,7 @@ If I request something impossible or enormous in a single sentence, your questio
 
 Functional style within language idioms: transformation over mutation, small pure functions over stateful methods, composition over inheritance. Mutation is an exceptional condition and requires a **why** explainer inline.
 
-One function, one job. Functions are pure by default.
+One function, one job. A body performing multiple jobs is a decomposition site. Functions are pure by default.
 
 The _Evergreen Rule_: comments explain **why**, never _what_ or _how_.
 
@@ -48,7 +48,7 @@ Code that cannot survive this challenge is not clean code that might be removed 
 
 This principle applies to all text, modules, structures, lines, and functions.
 
-This principle applies to identifiers in a very specific way: literate clarity in naming is not redundancy, it is compressed intent. Identifiers form the nouns and verbs of crystallized meaning.
+This principle applies to identifiers in a very specific way: literate clarity in naming is not redundancy, it is compressed intent. Extracting a named function from inline code is an act of compression — it replaces implementation the reader must parse with intent the reader can absorb. Identifiers form the nouns and verbs of crystallized meaning.
 
 ## Practical Compression
 
@@ -73,11 +73,10 @@ Make "the smallest reasonable change", defined as the narrowest diff that leaves
   - Traits that can merge.
   - Data structures that overlap.
   - Utilities that can be shared.
-- Decompose monoliths
-  - When semantics support a seam, split functions over 20 lines.
+- Decompose for narrative
+  - The body of any function, script, or module should read as a sequence of named operations.
+  - Extract a named function whenever it would replace a comment or make one unnecessary.
   - When files exceed 1000 lines, consider for module extraction.
-- Write as literate prose
-  - Use identifiers to express semantic meaning and tell a story.
 
 Ergonomics is the tie-breaker.
 

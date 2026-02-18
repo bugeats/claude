@@ -20,7 +20,7 @@ hooks/nix-format.sh          # PostToolUse hook: nixfmt via nix run (symlinked)
 hooks/nix-guardian.sh        # PreToolUse hook: prompt before non-nix build commands (symlinked)
 ```
 
-**Authored vs runtime**: the bootstrap script loops over `skills/*/` and `hooks/*.sh` — adding or removing a skill/hook directory is sufficient; no manifest update needed. A single `cleanup` function removes all nix-store-targeted symlinks; it runs on entry (stale cleanup) and on EXIT trap (ephemeral teardown). User-authored entries are preserved. `~/.claude/identity` is created on first run (user-prompted, defaults to `whoami`) and persists across ephemeral invocations. Everything else in `~/.claude/` (projects, history, sessions, cache, store.db) is mutable runtime state left unmanaged.
+**Authored vs runtime**: the bootstrap script loops over `skills/*/` and `hooks/*.sh` — adding or removing a skill/hook directory is sufficient; no manifest update needed. `remove_managed_symlinks` removes all nix-store-targeted symlinks; it runs on entry (stale cleanup) and on EXIT trap (via `on_exit`). User-authored entries are preserved. `~/.claude/identity` is created on first run (via `ensure_identity`, defaults to `whoami`) and persists across ephemeral invocations. Everything else in `~/.claude/` (projects, history, sessions, cache, store.db) is mutable runtime state left unmanaged.
 
 **Dependencies**: all runtime binaries (`claude`, `jq`, `grep`, `git`, `rg`, `coreutils`, `python3`, `figlet`, `tte`) are declared in `flake.nix` `runtimeInputs` — no ambient PATH assumptions. The miniwi figlet font is fetched via `pkgs.fetchurl` (hash-pinned, source: `xero/figlet-fonts`). Formatting runs `nixfmt-rfc-style` ephemerally via `nix run nixpkgs#nixfmt-rfc-style`.
 
@@ -34,7 +34,7 @@ nix run                        # bootstrap config + launch claude
 
 ## Current Focus
 
-Ephemeral lifecycle is functional: bootstrap symlinks config on entry, tears it down on exit via EXIT trap, and launches `claude`. `~/.claude/identity` is the only persistent artifact by design.
+Literate decomposition principles landed in `CLAUDE.system.md` and applied to `flake.nix` bootstrap script. The script body reads as a sequence of named operations: `ensure_config_dirs`, `ensure_identity`, `show_banner`, `remove_managed_symlinks`, `install_config`, `on_exit`.
 
 **`writeShellApplication` discipline**: all bash runs under `set -o errexit nounset pipefail`. Guard `&&` chains in functions with `if` statements — a short-circuiting `&&` chain as the last statement in a `for` loop inside a function propagates non-zero to the call site.
 

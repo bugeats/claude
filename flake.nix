@@ -53,44 +53,63 @@
             ];
             text = ''
               config_dir="$HOME/.claude"
-              mkdir -p "$config_dir/skills" "$config_dir/hooks"
 
-              # first-run identity prompt — persists across ephemeral nix run invocations
-              identity_file="$config_dir/identity"
-              if [ ! -f "$identity_file" ]; then
-                default_name="$(whoami)"
-                printf "How should Claude address you? [%s]: " "$default_name"
-                read -r user_name
-                user_name="''${user_name:-$default_name}"
-                echo "$user_name" > "$identity_file"
-              fi
+              ensure_config_dirs() {
+                mkdir -p "$config_dir/skills" "$config_dir/hooks"
+              }
 
-              user_name=$(cat "$identity_file")
-              clear
-              figlet -f "${miniwi-font}" "$user_name ships clean code" | tte slide
-              printf '\n  %s\n\n' "This Claude has superpowers. Say /school-me to learn more."
+              ensure_identity() {
+                if [ ! -f "$config_dir/identity" ]; then
+                  local default_name input
+                  default_name="$(whoami)"
+                  printf "How should Claude address you? [%s]: " "$default_name"
+                  read -r input
+                  echo "''${input:-$default_name}" > "$config_dir/identity"
+                fi
+              }
 
-              # remove symlinks we own (those targeting the nix store)
-              cleanup() {
+              show_banner() {
+                local name
+                name=$(cat "$config_dir/identity")
+                clear
+                figlet -f "${miniwi-font}" "$name ships clean code" | tte slide
+                printf '\n  %s\n\n' "This Claude has superpowers. Say /school-me to learn more."
+              }
+
+              remove_managed_symlinks() {
                 for f in "$config_dir/settings.json" "$config_dir/statusline.py" "$HOME/CLAUDE.md" \
                          "$config_dir"/skills/*/ "$config_dir"/hooks/*.sh; do
                   f="''${f%/}"
                   if [ -L "$f" ] && [[ "$(readlink "$f")" == /nix/store/* ]]; then rm "$f"; fi
                 done
               }
-              trap 'printf "\n  Cleaning up after myself ... "; cleanup; echo "ok"; printf "\n  Come back any time:\n\n      nix run ${flakeUri} --refresh\n\n"' EXIT
 
-              # setup: clean stale, place fresh
-              cleanup
-              ln -sf "${self}/settings.json" "$config_dir/settings.json"
-              for skill in "${self}"/skills/*/; do
-                ln -sfn "$skill" "$config_dir/skills/$(basename "$skill")"
-              done
-              ln -sf "${self}/statusline.py" "$config_dir/statusline.py"
-              for hook in "${self}"/hooks/*.sh; do
-                ln -sf "$hook" "$config_dir/hooks/$(basename "$hook")"
-              done
-              ln -sf "${self}/CLAUDE.system.md" "$HOME/CLAUDE.md"
+              install_config() {
+                ln -sf "${self}/settings.json" "$config_dir/settings.json"
+                for skill in "${self}"/skills/*/; do
+                  ln -sfn "$skill" "$config_dir/skills/$(basename "$skill")"
+                done
+                ln -sf "${self}/statusline.py" "$config_dir/statusline.py"
+                for hook in "${self}"/hooks/*.sh; do
+                  ln -sf "$hook" "$config_dir/hooks/$(basename "$hook")"
+                done
+                ln -sf "${self}/CLAUDE.system.md" "$HOME/CLAUDE.md"
+              }
+
+              # shellcheck disable=SC2329
+              on_exit() {
+                printf "\n  Cleaning up after myself ... "
+                remove_managed_symlinks
+                echo "ok"
+                printf "\n  Come back any time:\n\n      nix run ${flakeUri} --refresh\n\n"
+              }
+
+              ensure_config_dirs
+              ensure_identity
+              show_banner
+              trap on_exit EXIT
+              remove_managed_symlinks
+              install_config
 
               claude "$@" && exit_code=$? || exit_code=$?
               exit "$exit_code"

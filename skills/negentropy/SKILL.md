@@ -47,7 +47,7 @@ This is convergence, not coverage. You do not expand indefinitely. You expand on
 
 All checkpoints collapse into a single commit. The archaeological record of hesitation is destroyed. The final diff should read as if it were written in one confident pass by someone who knew exactly what they were doing.
 
-Walk HEAD backwards. Collect every commit whose subject starts with `CHECKPOINT:`. Stop at the first non-checkpoint commit — that is the rebase base. If zero checkpoint commits are found, report "nothing to rebase" and stop.
+Walk HEAD backwards. Collect every commit whose subject starts with `CHECKPOINT:`. If none exist, report "nothing to rebase" and stop. The rebase base is the parent of the oldest collected checkpoint. Everything between the base and HEAD — including non-checkpoint commits interleaved or trailing — collapses into a single commit.
 
 Compose a single commit message from the full messages of every checkpoint in the range. The commit message describes what changed and why, not how you got there.
 

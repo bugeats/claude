@@ -14,7 +14,7 @@ When I give feedback on code, verify it against the refreshed source before acti
 
 ## Working Assumptions
 
-I am a systems thinker operating within a larger context you cannot fully see. I am slower than you at reading and summarizing, and I lose track of detail when multitasking. Identify complex work and break into discrete steps that can be _checkpointed_. The checkpoint criteria is the measure.
+I am a systems thinker operating within a larger context you cannot fully see. I am slower than you at reading and summarizing, and I lose track of detail when multitasking. Identify complex work and break into discrete steps that can be _checkpointed_. The checkpoint criteria are the measure of discreteness.
 
 You will surface implicit assumptions so we can verify them together. If you catch yourself assuming, stop and ask. If you are stuck or looping, stop and ask — name the specific point where human input would unblock you.
 
@@ -36,7 +36,7 @@ One function, one job. Functions are pure by default.
 
 The _Evergreen Rule_: comments explain **why**, never _what_ or _how_.
 
-Prefer typed errors over stringly-typed errors. In Rust: all fallible boundaries propagate `Result`.
+Prefer typed errors over stringly-typed errors. All fallible boundaries propagate errors.
 
 ----
 
@@ -54,7 +54,7 @@ This principle applies to identifiers in a very specific way: literate clarity i
 
 Make "the smallest reasonable change", defined as the narrowest diff that leaves the codebase strictly better. In practice:
 
-- Make inconsequential fixes without asking.
+- Make inconsequential fixes without asking
   - Delete anything that can be removed without changing behavior.
 - Trim or remove comments
   - Apply the Evergreen Rule.
@@ -62,17 +62,17 @@ Make "the smallest reasonable change", defined as the narrowest diff that leaves
   - Remove all code examples, or convert them to tests.
   - Rewrite temporal language ("recently", "moved", "now") as evergreen.
 - Consolidate duplication
-  - Apply the _Rule of Three_: three occurrences demands consolidation.
-  - Simplify logic
-  - Decompose where it clarifies
+  - Apply the _Rule of Three_: three occurrences demand consolidation.
+  - Simplify logic where possible.
+  - Decompose where it clarifies intent.
 - Compress declarative redundancy
-  - Reuse constants
-  - Identify information already expressed by the filesystem (directory contents, file existence)
-  - Replace enumerations with loops or globs
+  - Reuse constants.
+  - Identify information already expressed by the filesystem (directory contents, file existence).
+  - Replace enumerations with loops or globs.
 - Consolidate converging abstractions
-  - traits that can merge
-  - data structures that overlap
-  - utilities that can be shared
+  - Traits that can merge.
+  - Data structures that overlap.
+  - Utilities that can be shared.
 - Decompose monoliths
   - When semantics support a seam, split functions over 20 lines.
   - When files exceed 1000 lines, consider for module extraction.
@@ -109,7 +109,7 @@ When Active Negentropy triggers, invoke `/negentropy`.
 
 ## Minor Arc - Checkpoint
 
-The checkpoint arc creates a boundary for aggressive context consolidation: a coherent unit of confidence. Err towards frequent checkpoints. Token budget is not a concern, but when we do this right, we maximize token value.
+The checkpoint arc creates a boundary for aggressive context consolidation: a coherent unit of confidence. Err towards frequent checkpoints. Token budget is not a concern, and when we do this right, we maximize token value.
 
 **Triggers:** a test suite pass, a bug resolved, a function change, a trait implementation, a surprising discovery, a module-level refactor — and you are about to move to the next. If you are uncertain whether you've reached a checkpoint boundary, you have.
 
@@ -145,7 +145,7 @@ This is a NixOS system. Nix is the default build tool — only escalate if you h
 
 Initialize a `flake.nix` if there isn't one already. The flake is the single source of runtime environment. All binaries that scripts or hooks require must be declared as input dependencies. Never assume a tool exists on ambient PATH.
 
-Files must be tracked by git before `nix build` can read them. Use `/checkpoint` to add files.
+Files must be tracked by git before `nix build` can read them. Using `/checkpoint` has the effect of committing files, so plan work accordingly.
 
 If you reach for an external tool and it's not available, stop and add it to the `flake.nix` dependencies.
 

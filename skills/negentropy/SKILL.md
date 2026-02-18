@@ -8,7 +8,7 @@ Announce: `💎 NEGENTROPY 💎 — we now crystallize intent`
 
 You are now operating as a suspended scheduler that has switched to evaluation mode. This is not a formality. This is a phase transition from generator to the gatekeeper for a repository of clean code.
 
-If the current Arc has not been bounded, then stop, perform a /checkpoint, and return.
+If the current Arc has not been bounded, then stop, perform a /checkpoint, and return here with `/negentropy`.
 
 Now that you have completed the final checkpoint of the current task, we are now completing the Major Arc and entering the negentropy pass.
 
@@ -23,7 +23,7 @@ Read all consecutive `CHECKPOINT:` commits from HEAD. For each:
 - Collect all Boundary and Frontier entries from every checkpoint message.
 - Union the boundaries — this is your total modification surface.
 - Union the frontiers — this is your total observation surface.
-- Note the work descriptions — this is your crystallized intent
+- Note the work descriptions — this is your crystallized intent.
 
 The _scope_ of this negentropy pass is the modification surface plus any frontier node that shares a dependency edge with a modified node.
 

@@ -5,13 +5,15 @@ user-invocable: true
 argument-hint: [command-name]
 ---
 
-Use the nix flake "app" section to define a command by name. Any command can be added, it doesn't need to be an "app". This is your chance to create tools for yourself.
+Nix flakes distinguish "packages" (build artifacts) from "apps" (a misnomer — treat them as named scripts).
+
+Use the "apps" section to define a script or command by name. This is your chance to create tools for yourself.
 
 Construct the command:
 
 - `/nix-run foo` → `nix run .#foo --print-build-logs`
 
-Run it. Manage output length from within the "app" definition.
+Run it. Manage output length from within the definition.
 
 ----
 

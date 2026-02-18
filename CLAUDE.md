@@ -4,17 +4,6 @@ Nix flake that manages Claude Code user-level configuration. The default package
 
 **Self-referential repo**: `CLAUDE.system.md` is symlinked to `~/CLAUDE.md`, which Claude Code loads as system-level instructions for every session. When working in this project, you are editing the instructions that govern you. Changes to `CLAUDE.system.md` take effect on next session start.
 
-## Current Focus
-
-Prompts and skills stabilized after consolidation arc. Verification items remain below.
-
-Open items:
-
-- **Color tuning**: Brand purple `#B388FF` is approximate — verify against actual Claude Code TUI source if possible.
-- **settings.json write-back**: Claude writes `feedbackSurveyState` to settings.json. Symlink to read-only store path may fail — may require copy-with-merge strategy.
-- **Hook verification**: `$HOME` expansion in hook command path untested. Hook stdin JSON schema (`tool_input.command`, `tool_input.file_path`) confirmed via docs but not verified at runtime.
-- **System flake integration**: Flake designed for both `nix run github:bugeats/claude` and inclusion in a system flake via `packages.default`. Neither path tested end-to-end.
-
 ## Architecture
 
 ```
@@ -41,3 +30,14 @@ hooks/nix-guardian.sh        # PreToolUse hook: prompt before non-nix build comm
 /nix-build my-foo              # nix build .#my-foo --print-build-logs
 nix run                        # bootstrap config + launch claude
 ```
+
+## Current Focus
+
+All prompts and skills stable. No active feature work.
+
+Open items:
+
+- **Color tuning**: Brand purple `#B388FF` is approximate — verify against actual Claude Code TUI source if possible.
+- **settings.json write-back**: Claude writes `feedbackSurveyState` to settings.json. Symlink to read-only store path may fail — may require copy-with-merge strategy.
+- **Hook verification**: `$HOME` expansion in hook command path untested. Hook stdin JSON schema (`tool_input.command`, `tool_input.file_path`) confirmed via docs but not verified at runtime.
+- **System flake integration**: Flake designed for both `nix run github:bugeats/claude` and inclusion in a system flake via `packages.default`. Neither path tested end-to-end.

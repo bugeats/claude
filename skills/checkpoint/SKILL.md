@@ -13,7 +13,7 @@ Avoid ceremony without compression: if you complete a checkpoint and nothing was
 Definitions:
 
 - Element: A named symbol, function, type, trait, or module.
-- Working Set: Elements added, modified, and removed since the last Bounded Arc.
+- Working Set: Elements added, modified, and removed since the last checkpoint.
 
 Execute all steps in order:
 
@@ -31,7 +31,7 @@ Purge sections no longer relevant to active work:
 2. Move each to `docs/<kebab-case-name>.md`.
 3. Replace the section with a link to the new file.
 
-Ensure there is a "Current Focus" section at the end and it is written to reflect where work stands after this checkpoint.
+Ensure there is a "Current Focus" section at the end of the project CLAUDE.md and that it is written to reflect where work stands after this checkpoint.
 
 ## Step 3 — Persist History
 

@@ -19,4 +19,6 @@ During troubleshooting, consider these heuristics:
 
 - **Read the full log.** The error is rarely the last line. Scroll up to the first failure.
 - **Suspect the hash before the change.** If the build doesn't reflect your edit, the source hash is stale — not the edit. Check that files are `git add`ed (flakes only see tracked files).
-- **Remember the daemon boundary.** Builds run under `nix-daemon`, not your shell. Your shell's environment variables, PATH entries, and shell config does not carry into the build sandbox. That's the point.
+- **Remember the daemon boundary.** Builds run under `nix-daemon`, not your shell. Environment variables, PATH entries, and shell config do not carry into the build sandbox.
+
+After the run completes, resume the prior task.

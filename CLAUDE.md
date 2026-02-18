@@ -6,7 +6,7 @@ Nix flake that manages Claude Code user-level configuration. The default package
 
 ## Current Focus
 
-Status line styling (`statusline.py`): matching the Claude Code TUI aesthetic. Pipe separators and ANSI color (including 24-bit for brand purple `#B388FF`) are in place. Context percentage uses threshold coloring (green/yellow/red). Status line supports full ANSI escapes including 24-bit RGB.
+Prompts and skills stabilized after consolidation arc. Verification items remain below.
 
 Open items:
 
@@ -23,8 +23,8 @@ CLAUDE.system.md             # system-level instructions (symlinked to ~/CLAUDE.
 settings.json                # user-global settings + hook config (symlinked)
 skills/checkpoint/SKILL.md   # user-scoped skill: tidy, consolidate, doc, commit
 skills/nix-build/SKILL.md    # user-scoped skill: nix build + diagnostic discipline
-skills/negentropy/SKILL.md   # user-scoped skill: compression, decomposition, comments, names
-skills/rebase/SKILL.md       # user-scoped skill: squash CHECKPOINT commits into one
+skills/negentropy/SKILL.md   # user-scoped skill: DCG-driven fixed-point compression + rebase
+skills/nix-run/SKILL.md      # user-scoped skill: run named nix flake app
 statusline.py                # status line: model, context, cost, duration, churn (symlinked)
 hooks/nix-format.sh          # PostToolUse hook: nixfmt via nix run (symlinked)
 hooks/nix-guardian.sh        # PreToolUse hook: prompt before non-nix build commands (symlinked)
@@ -39,6 +39,5 @@ hooks/nix-guardian.sh        # PreToolUse hook: prompt before non-nix build comm
 ```
 /nix-build                     # nix build --print-build-logs
 /nix-build my-foo              # nix build .#my-foo --print-build-logs
-/rebase                        # squash consecutive CHECKPOINT commits
 nix run                        # bootstrap config + launch claude
 ```

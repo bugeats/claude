@@ -2,21 +2,20 @@
 name: checkpoint
 description: Consolidate work, tidy touched files, update docs, and commit
 user-invocable: true
-argument-hint: [scope]
 ---
 
-Announce: `🚩 CHECKPOINT 🚩 - we now self-reflect`
+Announce: `🚩 CHECKPOINT 🚩 — we now self-reflect`
 
-You are now operating as a suspended scheduler that has switched to evaluation mode. This is not a formality. This is a phase transition from generator
-to critic.
+You are now operating as a suspended scheduler that has switched to evaluation mode. This is not a formality. This is a phase transition from generator to critic.
+
+Avoid ceremony without compression: if you complete a checkpoint and nothing was compressed or removed, treat this as a signal that you are either writing exceptionally clean code or — more likely — performing the ritual without applying the principle. Recheck.
 
 Definitions:
 
-- Scope: The focus of this checkpoint, expressed in natural language via the argument-hint, defaulting to the current task context.
-- Element: A named symbol, function, type, trait, or module - within Scope.
-- Working Set: Files touched and Elements added, modified, and removed since the last Bounded Arc - within Scope.
+- Element: A named symbol, function, type, trait, or module.
+- Working Set: Elements added, modified, and removed since the last Bounded Arc.
 
-Execute all four steps in order:
+Execute all steps in order:
 
 ## Step 1 — Atomic Tidy
 
@@ -40,23 +39,19 @@ Record a standard git commit with metadata hints for the _demanded computation g
 
 These hints will be consumed during /negentropy passes.
 
- Format:
- ```
+Format:
+```
 CHECKPOINT: <imperative summary>
 
 - <work item bullet points (exempt from the evergreen rule)>
 
 Boundary: <every Element directly modified (certain changed nodes)>
 
-Frontier: <every unmodified Element read from, depended on, or observed as adjacent to changes (edges traversed)>
+Frontier: <every unmodified Element and its containing module that was read from, depended on, or observed as adjacent to changes (edges traversed)>
 
 Context: <current task and what triggered this checkpoint>
 ```
 
 Omit the `Co-Authored-By` trailer.
 
----
-
-**The cardinal sin of the checkpoint is ceremony without deletion.** If you complete a checkpoint and nothing was compressed or removed, treat this as a signal that you are either writing exceptionally clean code or — more likely — performing the ritual without applying the principle. Recheck.
-
-After all steps are complete, resume any prior plan.
+After all steps are complete, resume the prior task.

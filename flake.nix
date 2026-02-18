@@ -31,6 +31,7 @@
             config.allowUnfree = true;
           };
           claude-code = claude-code-overlay.packages.${system}.claude;
+          flakeUri = "github:bugeats/claude";
           miniwi-font = pkgs.fetchurl {
             url = "https://raw.githubusercontent.com/xero/figlet-fonts/main/miniwi.flf";
             hash = "sha256-t9cGfmVdIEbU5sldhMOGMYxh4mFCWLGBfaCtvvZw/dk=";
@@ -69,25 +70,30 @@
               figlet -f "${miniwi-font}" "$user_name ships clean code" | tte slide
               printf '\n  %s\n\n' "This Claude has superpowers. Say /school-me to learn more."
 
+              # remove symlinks we own (those targeting the nix store)
+              cleanup() {
+                for f in "$config_dir/settings.json" "$config_dir/statusline.py" "$HOME/CLAUDE.md" \
+                         "$config_dir"/skills/*/ "$config_dir"/hooks/*.sh; do
+                  f="''${f%/}"
+                  if [ -L "$f" ] && [[ "$(readlink "$f")" == /nix/store/* ]]; then rm "$f"; fi
+                done
+              }
+              trap 'printf "\n  Cleaning up after myself ... "; cleanup; echo "ok"; printf "\n  Come back any time:\n\n      nix run ${flakeUri} --refresh\n\n"' EXIT
+
+              # setup: clean stale, place fresh
+              cleanup
               ln -sf "${self}/settings.json" "$config_dir/settings.json"
-              # clean stale skill symlinks that point into the nix store (ours)
-              for existing in "$config_dir"/skills/*/; do
-                [ -L "''${existing%/}" ] && [[ "$(readlink "''${existing%/}")" == /nix/store/* ]] && rm "''${existing%/}"
-              done
               for skill in "${self}"/skills/*/; do
                 ln -sfn "$skill" "$config_dir/skills/$(basename "$skill")"
               done
               ln -sf "${self}/statusline.py" "$config_dir/statusline.py"
-              # clean stale hook symlinks that point into the nix store (ours)
-              for existing in "$config_dir"/hooks/*.sh; do
-                [ -L "$existing" ] && [[ "$(readlink "$existing")" == /nix/store/* ]] && rm "$existing"
-              done
               for hook in "${self}"/hooks/*.sh; do
                 ln -sf "$hook" "$config_dir/hooks/$(basename "$hook")"
               done
               ln -sf "${self}/CLAUDE.system.md" "$HOME/CLAUDE.md"
 
-              exec claude "$@"
+              claude "$@" && exit_code=$? || exit_code=$?
+              exit "$exit_code"
             '';
           };
         }

@@ -1,6 +1,6 @@
 # Claude Code Configuration Flake
 
-Nix flake that manages Claude Code user-level configuration. The default package (`claude-bootstrap`) symlinks authored config into `~/.claude/` and execs `claude`.
+Nix flake that manages Claude Code user-level configuration. The default package (`claude-bootstrap`) symlinks authored config into `~/.claude/`, launches `claude`, and tears down symlinks on exit.
 
 **Self-referential repo**: `CLAUDE.system.md` is symlinked to `~/CLAUDE.md`, which Claude Code loads as system-level instructions for every session. When working in this project, you are editing the instructions that govern you. Changes to `CLAUDE.system.md` take effect on next session start.
 
@@ -20,7 +20,7 @@ hooks/nix-format.sh          # PostToolUse hook: nixfmt via nix run (symlinked)
 hooks/nix-guardian.sh        # PreToolUse hook: prompt before non-nix build commands (symlinked)
 ```
 
-**Authored vs runtime**: the bootstrap script loops over `skills/*/` and `hooks/*.sh` — adding or removing a skill/hook directory is sufficient; no manifest update needed. Stale symlinks pointing into the nix store are cleaned on each run; user-authored entries are preserved. `~/.claude/identity` is created on first run (user-prompted, defaults to `whoami`) and read by Claude at session start for personalized address. Everything else in `~/.claude/` (projects, history, sessions, cache, store.db) is mutable runtime state left unmanaged.
+**Authored vs runtime**: the bootstrap script loops over `skills/*/` and `hooks/*.sh` — adding or removing a skill/hook directory is sufficient; no manifest update needed. A single `cleanup` function removes all nix-store-targeted symlinks; it runs on entry (stale cleanup) and on EXIT trap (ephemeral teardown). User-authored entries are preserved. `~/.claude/identity` is created on first run (user-prompted, defaults to `whoami`) and persists across ephemeral invocations. Everything else in `~/.claude/` (projects, history, sessions, cache, store.db) is mutable runtime state left unmanaged.
 
 **Dependencies**: all runtime binaries (`claude`, `jq`, `grep`, `git`, `rg`, `coreutils`, `python3`, `figlet`, `tte`) are declared in `flake.nix` `runtimeInputs` — no ambient PATH assumptions. The miniwi figlet font is fetched via `pkgs.fetchurl` (hash-pinned, source: `xero/figlet-fonts`). Formatting runs `nixfmt-rfc-style` ephemerally via `nix run nixpkgs#nixfmt-rfc-style`.
 
@@ -34,11 +34,13 @@ nix run                        # bootstrap config + launch claude
 
 ## Current Focus
 
-Bootstrap and onboarding are stable. No active feature work.
+Ephemeral lifecycle is functional: bootstrap symlinks config on entry, tears it down on exit via EXIT trap, and launches `claude`. `~/.claude/identity` is the only persistent artifact by design.
+
+**`writeShellApplication` discipline**: all bash runs under `set -o errexit nounset pipefail`. Guard `&&` chains in functions with `if` statements — a short-circuiting `&&` chain as the last statement in a `for` loop inside a function propagates non-zero to the call site.
 
 Open items:
 
 - **Color tuning**: Brand purple `#B388FF` is approximate — verify against actual Claude Code TUI source if possible.
-- **settings.json write-back**: Claude writes `feedbackSurveyState` to settings.json. Symlink to read-only store path may fail — may require copy-with-merge strategy.
+- **settings.json write-back**: Claude writes `feedbackSurveyState` to settings.json. Symlink to read-only store path blocks writes — may require copy-with-merge strategy.
 - **Hook verification**: `$HOME` expansion in hook command path untested. Hook stdin JSON schema (`tool_input.command`, `tool_input.file_path`) confirmed via docs but not verified at runtime.
 - **System flake integration**: Flake designed for both `nix run github:bugeats/claude` and inclusion in a system flake via `packages.default`. Neither path tested end-to-end.

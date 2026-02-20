@@ -8,8 +8,10 @@ Nix flake that manages Claude Code user-level configuration. The default package
 
 ```
 flake.nix                    # default package = claude-bootstrap wrapper
+bootstrap.sh                 # bootstrap lifecycle: config install, claude launch, teardown
 CLAUDE.system.md             # system-level instructions (symlinked to ~/CLAUDE.md)
 settings.json                # user-global settings + hook config (symlinked)
+diagram.txt                  # arc workflow diagram (displayed in greeting banner)
 skills/checkpoint/SKILL.md   # user-scoped skill: tidy, consolidate, doc, commit
 skills/nix-build/SKILL.md    # user-scoped skill: nix build + diagnostic discipline
 skills/negentropy/SKILL.md   # user-scoped skill: DCG-driven fixed-point compression + rebase
@@ -34,9 +36,9 @@ nix run                        # bootstrap config + launch claude
 
 ## Current Focus
 
-Literate decomposition principles landed in `CLAUDE.system.md` and applied to `flake.nix` bootstrap script. The script body reads as a sequence of named operations: `ensure_config_dirs`, `ensure_identity`, `show_banner`, `remove_managed_symlinks`, `install_config`, `on_exit`.
+Bootstrap lifecycle extracted from inline Nix to `bootstrap.sh`. Nix-interpolated values (`self`, `miniwi-font`, `flakeUri`) are passed via `runtimeEnv` as `FLAKE_SELF`, `MINIWI_FONT`, `FLAKE_URI`.
 
-**`writeShellApplication` discipline**: all bash runs under `set -o errexit nounset pipefail`. Guard `&&` chains in functions with `if` statements — a short-circuiting `&&` chain as the last statement in a `for` loop inside a function propagates non-zero to the call site.
+**`writeShellApplication` discipline**: `bootstrap.sh` runs under `set -o errexit nounset pipefail`. Guard `&&` chains in functions with `if` statements — a short-circuiting `&&` chain as the last statement in a `for` loop inside a function propagates non-zero to the call site.
 
 Open items:
 

@@ -36,6 +36,8 @@ One function, one job. A body performing multiple jobs is a decomposition site. 
 
 The _Evergreen Rule_: comments explain **why**, never _what_ or _how_.
 
+Blank lines are structural punctuation. Separate blocks (`if`, `for`, `match`, `{}`), variable clusters, and function definitions with a blank line so each element breathes against its neighbors. Adjacent blocks without separation read as a run-on sentence.
+
 Prefer typed errors over stringly-typed errors. All fallible boundaries propagate errors.
 
 ----
@@ -61,6 +63,9 @@ Make "the smallest reasonable change", defined as the narrowest diff that leaves
   - Remove anything that restates what the code does.
   - Remove all code examples, or convert them to tests.
   - Rewrite temporal language ("recently", "moved", "now") as evergreen.
+- Use negative space
+  - Whitespace and naming are compression, not decoration
+  - Negative space reduces cognitive load and justifies the character count.
 - Consolidate duplication
   - Apply the _Rule of Three_: three occurrences demand consolidation.
   - Simplify logic where possible.
@@ -98,14 +103,6 @@ Workflow is structured around the concept of a _Bounded Arc_, a cyclic routine a
 
 You operate as a suspending scheduler. Work proceeds within two types of arcs, one inside the other, a wheel within a wheel. At the end of each arc, you stop generating and enter evaluation mode.
 
-## Major Arc - Active Negentropy
-
-The Active Negentropy arc creates a boundary for settled features written in clean code. During the Active Negentropy arc, the scope of the Compression Principle goes wide. It is a _compression_ of one or more checkpoint arcs, with each checkpoint embedding scope hints in its commit message.
-
-**Triggers:** a task plan has completed, a feature has landed, checkpoints have accumulated.
-
-When Active Negentropy triggers, invoke `/negentropy`.
-
 ## Minor Arc - Checkpoint
 
 The checkpoint arc creates a boundary for aggressive context consolidation: a coherent unit of confidence. Err towards frequent checkpoints. Token budget is not a concern, and when we do this right, we maximize token value.
@@ -113,6 +110,14 @@ The checkpoint arc creates a boundary for aggressive context consolidation: a co
 **Triggers:** a test suite pass, a bug resolved, a function change, a trait implementation, a surprising discovery, a module-level refactor — and you are about to move to the next. If you are uncertain whether you've reached a checkpoint boundary, you have.
 
 When a Checkpoint triggers, invoke `/checkpoint`.
+
+## Major Arc - Active Negentropy
+
+The Active Negentropy arc creates a boundary for settled features written in clean code. During the Active Negentropy arc, the scope of the Compression Principle goes wide. It is a _compression_ of one or more checkpoint arcs, with each checkpoint embedding scope hints in its commit message.
+
+**Triggers:** a task plan has completed, a feature has landed, checkpoints have accumulated.
+
+When Active Negentropy triggers, invoke `/negentropy`.
 
 ----
 

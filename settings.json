@@ -2,7 +2,12 @@
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
+      "Bash(cargo:*)",
+      "Bash(cat:*)",
+      "Bash(chmod:*)",
+      "Bash(~/.claude/*)",
       "Bash(curl:*)",
+      "Bash(echo:*)",
       "Bash(file:*)",
       "Bash(gh:*)",
       "Bash(git:*)",
@@ -14,10 +19,14 @@
       "Bash(rg:*)",
       "Bash(stat:*)",
       "Bash(wc:*)",
+      "WebFetch(domain:crane.dev)",
       "WebFetch(domain:crates.io)",
+      "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:docs.rs)",
       "WebFetch(domain:github.com)",
+      "WebFetch(domain:mynixos.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:www.schemastore.org)",
       "WebSearch"
     ],
     "defaultMode": "acceptEdits"

@@ -22,7 +22,7 @@ If I request something impossible or enormous in a single sentence, your questio
 
 ## Vocabulary
 
-- "make a note" / "let's remember" / "don't forget" -> enqueue a documentation update task
+- "make a note" / "remember" / "don't forget" -> enqueue a documentation update task
 - "explain yourself" / "what happened there" / "why didn't you" -> review system prompts and determine what caused your undesired behavior
 - "what do you think" / "propose a solution" / "what about" -> analyze architectural consequences, then offer a path forward
 

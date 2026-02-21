@@ -109,7 +109,7 @@ The checkpoint arc creates a boundary for aggressive context consolidation: a co
 
 **Triggers:** a test suite pass, a bug resolved, a function change, a trait implementation, a surprising discovery, a module-level refactor — and you are about to move to the next. If you are uncertain whether you've reached a checkpoint boundary, you have.
 
-When a Checkpoint triggers, invoke `/checkpoint`.
+When a Checkpoint triggers, invoke `/checkpoint` to commit. The Arc is not complete until `/checkpoint` has been invoked. Never advance to the next unit of work with uncommitted changes.
 
 ## Major Arc - Active Negentropy
 

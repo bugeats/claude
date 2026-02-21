@@ -18,7 +18,11 @@ When you do this right, no new disorder is introduced to the codebase.
 
 ## Phase 1 — Assemble The DCG
 
-Read all consecutive `CHECKPOINT:` commits from HEAD. For each:
+Read all consecutive `CHECKPOINT:` commits from HEAD — walk backwards until the first non-`CHECKPOINT:` subject. This collection spans all consecutive checkpoints regardless of which task produced them.
+
+List the collected commits (hash + subject) and the rebase base (parent of the oldest) before proceeding.
+
+For each collected checkpoint:
 
 - Collect all Boundary and Frontier entries from every checkpoint message.
 - Union the boundaries — this is your total modification surface.
@@ -47,7 +51,7 @@ This is convergence, not coverage. You do not expand indefinitely. You expand on
 
 All checkpoints collapse into a single commit. The archaeological record of hesitation is destroyed. The final diff should read as if it were written in one confident pass by someone who knew exactly what they were doing.
 
-Walk HEAD backwards. Collect every commit whose subject starts with `CHECKPOINT:`. If none exist, report "nothing to rebase" and stop. The rebase base is the parent of the oldest collected checkpoint. Everything between the base and HEAD — including non-checkpoint commits interleaved or trailing — collapses into a single commit.
+Using the commit set and rebase base identified in Phase 1, squash all commits between the base and HEAD into a single commit. If Phase 1 found no checkpoints, report "nothing to rebase" and stop. Everything between the base and HEAD — including non-checkpoint commits interleaved or trailing — collapses into a single commit.
 
 Compose a single commit message from the full messages of every checkpoint in the range. The commit message describes what changed and why, not how you got there.
 

@@ -48,7 +48,7 @@ install_config() {
     mv "$settings" "$backup"
   fi
 
-  cp "$FLAKE_SELF/settings.json" "$settings"
+  install -m 0644 "$FLAKE_SELF/settings.json" "$settings"
 
   for skill in "$FLAKE_SELF"/skills/*/; do
     ln -sfn "$skill" "$config_dir/skills/$(basename "$skill")"

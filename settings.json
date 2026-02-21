@@ -4,12 +4,18 @@
     "allow": [
       "WebSearch",
       "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(nix:*)",
       "Bash(nix-prefetch-github:*)",
-      "Bash(nix build:*)",
-      "Bash(nix develop:*)",
-      "Bash(nix run:*)",
-      "Bash(nix flake:*)",
-      "Bash(curl:*)"
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(curl:*)",
+      "Bash(jq:*)",
+      "Bash(rg:*)",
+      "Bash(python3:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(file:*)",
+      "Bash(stat:*)"
     ],
     "defaultMode": "acceptEdits"
   },

@@ -4,7 +4,7 @@ description: Consolidate work, tidy touched files, update docs, and commit
 user-invocable: true
 ---
 
-Announce: `🚩 CHECKPOINT 🚩 — we now self-reflect`
+Announce: `Arc Close: 🚩 Checkpoint — We Now Self-Reflect`
 
 You are now operating as a suspended scheduler that has switched to evaluation mode. This is not a formality. This is a phase transition from generator to critic.
 

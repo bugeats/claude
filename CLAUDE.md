@@ -17,7 +17,7 @@ skills/nix-build/SKILL.md    # user-scoped skill: nix build + diagnostic discipl
 skills/negentropy/SKILL.md   # user-scoped skill: DCG-driven fixed-point compression + rebase
 skills/nix-run/SKILL.md      # user-scoped skill: run named nix flake app
 skills/school-me/SKILL.md    # user-scoped skill: guided tour of this config's workflow
-statusline.py                # status line: model, context, cost, duration, churn (symlinked)
+statusline.py                # status line: arc depth from git log, model, context, cost, churn (symlinked)
 hooks/nix-format.sh          # PostToolUse hook: nixfmt via nix run (symlinked)
 hooks/nix-guardian.sh        # PreToolUse hook: prompt before non-nix build commands (symlinked)
 ```
@@ -36,7 +36,7 @@ nix run                        # bootstrap config + launch claude
 
 ## Current Focus
 
-Bootstrap lifecycle and default permissions are stable. No active feature work.
+Bootstrap lifecycle and default permissions are stable.
 
 **`writeShellApplication` discipline**: `bootstrap.sh` runs under `set -o errexit nounset pipefail`. Guard `&&` chains in functions with `if` statements — a short-circuiting `&&` chain as the last statement in a `for` loop inside a function propagates non-zero to the call site. Files copied from `/nix/store/` inherit `444` permissions — always set explicit modes.
 

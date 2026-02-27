@@ -145,7 +145,7 @@ External source code trumps external documentation — when debugging dependenci
 
 # Working With Nix
 
-This is a NixOS system. Nix is the default build tool — only escalate if you hit a specific limitation, and explain why.
+This system has Nix installed. Nix is the default build tool — only escalate if you hit a specific limitation, and explain why.
 
 Initialize a `flake.nix` if there isn't one already. The flake is the single source of runtime environment. All binaries that scripts or hooks require must be declared as input dependencies. Never assume a tool exists on ambient PATH.
 

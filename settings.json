@@ -29,7 +29,8 @@
       "WebFetch(domain:mynixos.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:www.schemastore.org)",
-      "WebSearch"
+      "WebSearch",
+      "mcp__rust-analyzer__*"
     ],
     "defaultMode": "acceptEdits"
   },

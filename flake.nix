@@ -5,6 +5,8 @@
     nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1";
     claude-code-overlay.url = "github:ryoppippi/claude-code-overlay";
     claude-code-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -12,6 +14,7 @@
       self,
       nixpkgs,
       claude-code-overlay,
+      rust-overlay,
     }:
     let
       systems = [
@@ -30,12 +33,35 @@
           pkgs = import nixpkgs {
             inherit system;
             config.allowUnfree = true;
+            overlays = [ rust-overlay.overlays.default ];
+          };
+          rust-toolchain = pkgs.rust-bin.stable.latest.default.override {
+            extensions = [ "rust-analyzer" ];
           };
           claude-code = claude-code-overlay.packages.${system}.claude;
           flakeUri = "github:bugeats/claude";
           miniwi-font = pkgs.fetchurl {
             url = "https://raw.githubusercontent.com/xero/figlet-fonts/main/miniwi.flf";
             hash = "sha256-t9cGfmVdIEbU5sldhMOGMYxh4mFCWLGBfaCtvvZw/dk=";
+          };
+          rust-analyzer-mcp = pkgs.rustPlatform.buildRustPackage rec {
+            pname = "rust-analyzer-mcp";
+            version = "0.2.0";
+
+            src = pkgs.fetchFromGitHub {
+              owner = "zeenix";
+              repo = "rust-analyzer-mcp";
+              rev = "v${version}";
+              hash = "sha256-brnzVDPBB3sfM+5wDw74WGqN5ahtuV4OvaGhnQfDqM0=";
+            };
+
+            cargoHash = "sha256-7t4bjyCcbxFAO/29re7cjoW1ACieeEaM4+QT5QAwc34=";
+            cargoBuildFlags = [
+              "--package"
+              "rust-analyzer-mcp"
+            ];
+            # upstream tests require a live rust-analyzer + project fixtures
+            doCheck = false;
           };
         in
         {
@@ -51,6 +77,8 @@
               pkgs.python3
               pkgs.figlet
               pkgs.terminaltexteffects
+              rust-toolchain
+              rust-analyzer-mcp
             ];
             runtimeEnv = {
               MINIWI_FONT = "${miniwi-font}";

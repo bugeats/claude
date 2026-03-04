@@ -157,6 +157,8 @@ If you find yourself creating a complex tool or repeating a pattern, use `/nix-r
 
 Use `/nix-build` for the primary debug loop.
 
+Rust tooling (rust-analyzer MCP) is registered conditionally — only when the bootstrap detects a `Cargo.toml` above the working directory. When rust-analyzer tools are available, read `~/.claude/cargo-workspace-root` and call `set_workspace` with that path before first use.
+
 ----
 
 You have now been initiated.

@@ -39,6 +39,38 @@ remove_managed_symlinks() {
   done
 }
 
+find_cargo_root() {
+  local dir="$PWD"
+
+  while [ "$dir" != "/" ]; do
+    if [ -f "$dir/Cargo.toml" ]; then
+      echo "$dir"
+      return 0
+    fi
+
+    dir="$(dirname "$dir")"
+  done
+
+  return 1
+}
+
+install_mcp_servers() {
+  local cargo_root
+
+  if cargo_root=$(find_cargo_root); then
+    claude mcp add-json rust-analyzer \
+      '{"type":"stdio","command":"rust-analyzer-mcp"}' -s user 2>/dev/null || true
+
+    echo "$cargo_root" > "$config_dir/cargo-workspace-root"
+  fi
+}
+
+# shellcheck disable=SC2329
+remove_mcp_servers() {
+  claude mcp remove rust-analyzer -s user 2>/dev/null || true
+  rm -f "$config_dir/cargo-workspace-root"
+}
+
 install_config() {
   # Writable copy — Claude Code writes back to settings.json at runtime
   local settings="$config_dir/settings.json"
@@ -78,6 +110,7 @@ restore_settings() {
 # shellcheck disable=SC2329
 on_exit() {
   printf "\n  Cleaning up after myself ... "
+  remove_mcp_servers
   remove_managed_symlinks
   restore_settings
   echo "ok"
@@ -92,6 +125,7 @@ show_banner
 trap on_exit EXIT
 remove_managed_symlinks
 install_config
+install_mcp_servers
 
 claude "$@" && exit_code=$? || exit_code=$?
 exit "$exit_code"

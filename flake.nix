@@ -36,7 +36,10 @@
             overlays = [ rust-overlay.overlays.default ];
           };
           rust-toolchain = pkgs.rust-bin.stable.latest.default.override {
-            extensions = [ "rust-analyzer" ];
+            extensions = [
+              "rust-analyzer"
+              "rust-src"
+            ];
           };
           claude-code = claude-code-overlay.packages.${system}.claude;
           flakeUri = "github:bugeats/claude";

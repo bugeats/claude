@@ -22,32 +22,45 @@ added = cost.get("total_lines_added", 0) or 0
 removed = cost.get("total_lines_removed", 0) or 0
 
 
-def count_checkpoints(cwd):
+def git_query(cwd, args):
     if not cwd:
-        return 0
+        return None
 
     try:
         result = subprocess.run(
-            ["git", "log", "-50", "--format=%s"],
+            ["git"] + args,
             cwd=cwd,
             capture_output=True,
             text=True,
             timeout=2,
         )
     except (subprocess.TimeoutExpired, FileNotFoundError):
-        return 0
+        return None
 
     if result.returncode != 0:
+        return None
+
+    return result.stdout.strip()
+
+
+def count_checkpoints(cwd):
+    output = git_query(cwd, ["log", "-50", "--format=%s"])
+
+    if output is None:
         return 0
 
     count = 0
-    for subject in result.stdout.splitlines():
+    for subject in output.splitlines():
         if subject.startswith("CHECKPOINT:"):
             count += 1
         else:
             break
 
     return count
+
+
+def current_branch(cwd):
+    return git_query(cwd, ["rev-parse", "--abbrev-ref", "HEAD"])
 
 
 def format_tokens(n):
@@ -75,7 +88,12 @@ RED = "\033[31m"
 PURPLE = "\033[38;2;179;136;255m"  # #B388FF — Claude brand accent
 
 checkpoints = count_checkpoints(project_dir)
+branch = current_branch(project_dir)
+
 arc_label = f"{PURPLE}Arcs ⌁{checkpoints}{RESET} {DIM}|{RESET} {model}"
+
+if branch:
+    arc_label += f" {DIM}on{RESET} {branch}"
 
 if percentage >= 90:
     pct_color = RED

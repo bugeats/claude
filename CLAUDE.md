@@ -17,7 +17,7 @@ skills/nix-build/SKILL.md    # user-scoped skill: nix build + diagnostic discipl
 skills/negentropy/SKILL.md   # user-scoped skill: DCG-driven fixed-point compression + rebase
 skills/nix-run/SKILL.md      # user-scoped skill: run named nix flake app
 skills/school-me/SKILL.md    # user-scoped skill: guided tour of this config's workflow
-statusline.py                # status line: arc depth from git log, model, context, cost, churn (symlinked)
+statusline.py                # status line: arc depth, git branch, model, context, cost, churn (symlinked)
 hooks/nix-format.sh          # PostToolUse hook: nixfmt via nix run (symlinked)
 hooks/nix-guardian.sh        # PreToolUse hook: prompt before non-nix build commands (symlinked)
 hooks/rust-format.sh         # PostToolUse hook: rustfmt via rust-toolchain PATH (symlinked)

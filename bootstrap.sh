@@ -1,7 +1,7 @@
 config_dir="$HOME/.claude"
 
 ensure_config_dirs() {
-  mkdir -p "$config_dir/skills" "$config_dir/hooks"
+  mkdir -p "$config_dir/skills" "$config_dir/hooks" "$config_dir/tools"
 }
 
 ensure_identity() {
@@ -30,13 +30,18 @@ show_banner() {
   printf '\n  %s\n\n' "This Claude is equipped with an entropy containment system. Say /school-me for more."
 }
 
-remove_managed_symlinks() {
-  for f in "$config_dir/settings.json" "$config_dir/statusline.py" "$HOME/CLAUDE.md" \
-           "$config_dir"/skills/*/ "$config_dir"/hooks/*.sh; do
+remove_managed_artifacts() {
+  # Symlinks into the nix store (skills, statusline, CLAUDE.md)
+  for f in "$config_dir/statusline.py" "$HOME/CLAUDE.md" "$config_dir"/skills/*/; do
     f="${f%/}"
 
     if [ -L "$f" ] && [[ "$(readlink "$f")" == /nix/store/* ]]; then rm "$f"; fi
   done
+
+  # Copied files (settings, tools, hooks) — remove unconditionally
+  rm -f "$config_dir/settings.json"
+  rm -f "$config_dir"/tools/*.sh
+  rm -f "$config_dir"/hooks/*.sh
 }
 
 find_cargo_root() {
@@ -88,8 +93,12 @@ install_config() {
 
   ln -sf "$FLAKE_SELF/statusline.py" "$config_dir/statusline.py"
 
+  for tool in "$FLAKE_SELF"/tools/*.sh; do
+    install -m 0755 "$tool" "$config_dir/tools/$(basename "$tool")"
+  done
+
   for hook in "$FLAKE_SELF"/hooks/*.sh; do
-    ln -sf "$hook" "$config_dir/hooks/$(basename "$hook")"
+    install -m 0755 "$hook" "$config_dir/hooks/$(basename "$hook")"
   done
 
   ln -sf "$FLAKE_SELF/CLAUDE.system.md" "$HOME/CLAUDE.md"
@@ -111,7 +120,7 @@ restore_settings() {
 on_exit() {
   printf "\n  Cleaning up after myself ... "
   remove_mcp_servers
-  remove_managed_symlinks
+  remove_managed_artifacts
   restore_settings
   echo "ok"
 
@@ -123,7 +132,7 @@ ensure_identity
 show_banner
 
 trap on_exit EXIT
-remove_managed_symlinks
+remove_managed_artifacts
 install_config
 install_mcp_servers
 

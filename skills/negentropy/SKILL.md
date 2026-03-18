@@ -18,9 +18,9 @@ When you do this right, no new disorder is introduced to the codebase.
 
 ## Phase 1 — Assemble The DCG
 
-Read all consecutive `CHECKPOINT:` commits from HEAD — walk backwards until the first non-`CHECKPOINT:` subject. This collection spans all consecutive checkpoints regardless of which task produced them.
+Run `~/.claude/tools/checkpoint-range.sh` to collect the checkpoint range and rebase base. If the tool exits non-zero, there are no checkpoints to process — report this and stop.
 
-List the collected commits (hash + subject) and the rebase base (parent of the oldest) before proceeding.
+List the collected commits (hash + subject) and the rebase base before proceeding.
 
 For each collected checkpoint:
 

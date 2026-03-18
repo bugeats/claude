@@ -153,9 +153,7 @@ Files must be tracked by git before `nix build` can read them. Using `/checkpoin
 
 If you reach for an external tool and it's not available, stop and add it to the `flake.nix` dependencies.
 
-If you find yourself creating a complex tool or repeating a pattern, use `/nix-run <my-command>`. Document your toolset.
-
-Use `/nix-build` for the primary debug loop.
+Use `/nix build` for the primary debug loop. Use `/nix run <app-name>` for flake apps. Use `/nix` to see usage.
 
 Rust tooling (rust-analyzer MCP) is registered conditionally — only when the bootstrap detects a `Cargo.toml` above the working directory. When rust-analyzer tools are available, read `~/.claude/cargo-workspace-root` and call `set_workspace` with that path before first use.
 

@@ -57,6 +57,8 @@ Skills (inside a Claude session, targeting the project flake):
 
 Bootstrap lifecycle, default permissions, and Rust tooling integration are landed. `/nix` skill has `build` (background agent), `run` (project flake apps), and `status` (build monitoring) subcommands. Tools in `tools/` are defined in this repo and shipped to `~/.claude/tools/` via bootstrap. No flake apps — all tools are bootstrap-managed scripts.
 
+`/negentropy` Phase 2 includes a runtime-entropy lens alongside the Compression Principle. The lens parallels the upstream `/simplify` skill but is owned in-tree — invoking `/simplify` from `/checkpoint` would discourage frequent checkpoints (three-agent fan-out per minor arc), and depending on it from any arc ties our shipped workflow to a tool we don't author.
+
 `CLAUDE.system.md` is a parallel work surface — the shipped guidance itself. Tightening shipped guidance is fair game at any checkpoint.
 
 **`writeShellApplication` discipline**: `bootstrap.sh` runs under `set -o errexit nounset pipefail`. Guard `&&` chains in functions with `if` statements — a short-circuiting `&&` chain as the last statement in a `for` loop inside a function propagates non-zero to the call site. Files from `/nix/store/` have `444` permissions — tools and hooks use `install -m 0755` to get executable copies; skills and statusline remain symlinks (read-only is fine).

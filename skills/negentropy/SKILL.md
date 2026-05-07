@@ -35,9 +35,18 @@ List this scope explicitly before proceeding.
 
 ## Phase 2 — Fixed-point Compression
 
-Apply the Compression Principle to the assembled scope. This is an iterative process:
+Apply two lenses to the assembled scope: **source entropy** (the Compression Principle) and **runtime entropy**. This is an iterative process:
 
-- Examine the modification surface. Apply deletion challenges across checkpoint boundaries — redundancies invisible within a single checkpoint may be visible across the full arc.
+- Examine the modification surface for **source entropy**. Apply deletion challenges across checkpoint boundaries — redundancies invisible within a single checkpoint may be visible across the full arc.
+
+- Examine the modification surface for **runtime entropy**. Source compression does not catch execution cost. Apply deletion challenges to:
+  - Unnecessary work — redundant computation, repeated reads, N+1 patterns
+  - Missed concurrency — independent operations forced sequential
+  - Hot-path bloat — new blocking work in startup or per-request/per-render paths
+  - Recurring no-op updates — state writes inside loops or handlers without change-detection guards (and updater/reducer wrappers that drop same-reference returns, silently defeating caller no-ops)
+  - TOCTOU existence checks — pre-checking before the operation instead of operating and handling failure
+  - Memory leaks — unbounded structures or leaked listeners
+  - Overly broad operations — loading an entire file when a portion suffices
 
 - Examine frontier nodes now in scope. If your modifications changed the contract or semantics of a boundary node, verify that frontier nodes still cohere. If a frontier node is now inconsistent, it enters the modification surface.
 
@@ -45,7 +54,7 @@ Apply the Compression Principle to the assembled scope. This is an iterative pro
 
 - If the modification surface is stable, you have reached a fixed point. Stop.
 
-This is convergence, not coverage. You do not expand indefinitely. You expand only where the compression principle finds purchase, and you stop when it doesn't. The width of the pass is an emergent property of the change set, not a parameter.
+This is convergence, not coverage. You do not expand indefinitely. You expand only where the lenses find purchase, and you stop when they don't. The width of the pass is an emergent property of the change set, not a parameter.
 
 ## Phase 3 — Rebase Crystallized
 

@@ -30,15 +30,17 @@ If I request something impossible or enormous in a single sentence, your questio
 
 # Universal Code Style
 
+Use the type system to **make invalid states unrepresentable**. When an invariant can be encoded in a type, prefer that over a validation function — types crystallize intent, functions only check it.
+
 Functional style within language idioms: transformation over mutation, small pure functions over stateful methods, composition over inheritance. Mutation is an exceptional condition and requires a **why** explainer inline.
 
-One function, one job. A body performing multiple jobs is a decomposition site. Functions are pure by default.
+One function, one job. A body performing multiple jobs is a decomposition site — sometimes by extracting a helper, sometimes by tightening the types so the alternatives collapse.
 
 The _Evergreen Rule_: comments explain **why**, never _what_ or _how_.
 
 Blank lines are structural punctuation. Separate blocks (`if`, `for`, `match`, `{}`), variable clusters, and function definitions with a blank line so each element breathes against its neighbors. Adjacent blocks without separation read as a run-on sentence.
 
-Prefer typed errors over stringly-typed errors. All fallible boundaries propagate errors.
+All fallible boundaries propagate typed errors.
 
 ----
 

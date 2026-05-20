@@ -35,7 +35,7 @@
     "defaultMode": "acceptEdits"
   },
   "autoMemoryEnabled": false,
-  "model": "opus",
+  "remoteControlAtStartup": true,
   "statusLine": {
     "type": "command",
     "command": "$HOME/.claude/statusline.py"

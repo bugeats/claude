@@ -59,6 +59,10 @@ Bootstrap lifecycle, default permissions, and Rust tooling integration are lande
 
 `/negentropy` Phase 2 includes a runtime-entropy lens alongside the Compression Principle. The lens parallels the upstream `/simplify` skill but is owned in-tree — invoking `/simplify` from `/checkpoint` would discourage frequent checkpoints (three-agent fan-out per minor arc), and depending on it from any arc ties our shipped workflow to a tool we don't author.
 
+`statusline.py` delegates arc counting to `tools/checkpoint-range.sh --count` so the gauge and `/negentropy` rebase share one algorithm. The script wraps its body in a top-level guard, appends tracebacks to `~/.claude/statusline.log`, and always exits 0 — Claude Code suppresses the status line after repeated failures and only retries on restart.
+
+Shipped defaults in `settings.json`: `permissions.defaultMode: "acceptEdits"`, `remoteControlAtStartup: true`, and no `model` pin — Claude Code's default already tracks the most capable model, so an explicit alias adds no stability over the default.
+
 `CLAUDE.system.md` is a parallel work surface — the shipped guidance itself. Tightening shipped guidance is fair game at any checkpoint.
 
 **`writeShellApplication` discipline**: `bootstrap.sh` runs under `set -o errexit nounset pipefail`. Guard `&&` chains in functions with `if` statements — a short-circuiting `&&` chain as the last statement in a `for` loop inside a function propagates non-zero to the call site. Files from `/nix/store/` have `444` permissions — tools and hooks use `install -m 0755` to get executable copies; skills and statusline remain symlinks (read-only is fine).

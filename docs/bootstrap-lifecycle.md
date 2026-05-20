@@ -29,4 +29,4 @@ Conditional — `find_cargo_root` walks from `$PWD` and registers rust-analyzer 
 
 ## Unmanaged State
 
-Everything else in `~/.claude/` (projects, history, sessions, cache, store.db) is mutable runtime state left unmanaged.
+Everything else in `~/.claude/` (projects, history, sessions, cache, store.db, `statusline.log`) is mutable runtime state left unmanaged. `statusline.log` accumulates tracebacks when the status-line script catches an exception — checking it diagnoses a disappearing status bar.

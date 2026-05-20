@@ -1,38 +1,29 @@
 #!/usr/bin/env python3
 import json
+import os
 import subprocess
 import sys
+import traceback
+from datetime import datetime
 
-data = json.load(sys.stdin)
+RESET = "\033[0m"
+DIM = "\033[2m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+RED = "\033[31m"
+PURPLE = "\033[38;2;179;136;255m"  # #B388FF — Claude brand accent
 
-model = data.get("model", {}).get("display_name", "?")
-project_dir = data.get("workspace", {}).get("project_dir", "")
-
-context_window = data.get("context_window", {})
-percentage = int(context_window.get("used_percentage", 0) or 0)
-filled = percentage // 10
-progress_bar = "\u2593" * filled + "\u2591" * (10 - filled)
-tok_input_count = context_window.get("total_input_tokens", 0)
-tok_output_count = context_window.get("total_output_tokens", 0)
-
-cost = data.get("cost", {})
-dollars = cost.get("total_cost_usd", 0) or 0
-duration_ms = cost.get("total_duration_ms", 0) or 0
-added = cost.get("total_lines_added", 0) or 0
-removed = cost.get("total_lines_removed", 0) or 0
+CHECKPOINT_TOOL = os.path.expanduser("~/.claude/tools/checkpoint-range.sh")
+ERROR_LOG = os.path.expanduser("~/.claude/statusline.log")
 
 
-def git_query(cwd, args):
+def run_silent(cwd, args):
     if not cwd:
         return None
 
     try:
         result = subprocess.run(
-            ["git"] + args,
-            cwd=cwd,
-            capture_output=True,
-            text=True,
-            timeout=2,
+            args, cwd=cwd, capture_output=True, text=True, timeout=2
         )
     except (subprocess.TimeoutExpired, FileNotFoundError):
         return None
@@ -44,23 +35,18 @@ def git_query(cwd, args):
 
 
 def count_checkpoints(cwd):
-    output = git_query(cwd, ["log", "-50", "--format=%s"])
+    # Delegates to the canonical bash tool so the statusline gauge and the
+    # /negentropy rebase agree on what counts as an arc.
+    output = run_silent(cwd, ["bash", CHECKPOINT_TOOL, "--count"])
 
-    if output is None:
+    try:
+        return int(output) if output else 0
+    except ValueError:
         return 0
-
-    count = 0
-    for subject in output.splitlines():
-        if subject.startswith("CHECKPOINT:"):
-            count += 1
-        else:
-            break
-
-    return count
 
 
 def current_branch(cwd):
-    return git_query(cwd, ["rev-parse", "--abbrev-ref", "HEAD"])
+    return run_silent(cwd, ["git", "rev-parse", "--abbrev-ref", "HEAD"])
 
 
 def format_tokens(n):
@@ -80,36 +66,73 @@ def format_duration(ms):
     return f"{m}m{s:02d}s"
 
 
-RESET = "\033[0m"
-DIM = "\033[2m"
-GREEN = "\033[32m"
-YELLOW = "\033[33m"
-RED = "\033[31m"
-PURPLE = "\033[38;2;179;136;255m"  # #B388FF — Claude brand accent
+def render(data):
+    model = data.get("model", {}).get("display_name", "?")
+    project_dir = data.get("workspace", {}).get("project_dir", "")
 
-checkpoints = count_checkpoints(project_dir)
-branch = current_branch(project_dir)
+    context_window = data.get("context_window", {})
+    percentage = int(context_window.get("used_percentage", 0) or 0)
+    filled = percentage // 10
+    progress_bar = "▓" * filled + "░" * (10 - filled)
+    tok_input_count = context_window.get("total_input_tokens", 0)
+    tok_output_count = context_window.get("total_output_tokens", 0)
 
-arc_label = f"{PURPLE}Arcs ⌁{checkpoints}{RESET} {DIM}|{RESET} {model}"
+    cost = data.get("cost", {})
+    dollars = cost.get("total_cost_usd", 0) or 0
+    duration_ms = cost.get("total_duration_ms", 0) or 0
+    added = cost.get("total_lines_added", 0) or 0
+    removed = cost.get("total_lines_removed", 0) or 0
 
-if branch:
-    arc_label += f" {DIM}on{RESET} {branch}"
+    checkpoints = count_checkpoints(project_dir)
+    branch = current_branch(project_dir)
 
-if percentage >= 90:
-    pct_color = RED
-elif percentage >= 70:
-    pct_color = YELLOW
-else:
-    pct_color = GREEN
+    arc_label = f"{PURPLE}Arcs ⌁{checkpoints}{RESET} {DIM}|{RESET} {model}"
 
-sep = f" {DIM}|{RESET} "
+    if branch:
+        arc_label += f" {DIM}on{RESET} {branch}"
 
-parts = [
-    arc_label,
-    f"{progress_bar} {pct_color}{percentage}%{RESET} {DIM}▲{RESET}{format_tokens(tok_input_count)} {DIM}▼{RESET}{format_tokens(tok_output_count)}",
-    f"${dollars:.2f}",
-    format_duration(duration_ms),
-    f"{GREEN}+{added}{RESET}{RED}-{removed}{RESET}",
-]
+    if percentage >= 90:
+        pct_color = RED
+    elif percentage >= 70:
+        pct_color = YELLOW
+    else:
+        pct_color = GREEN
 
-print(sep.join(parts))
+    sep = f" {DIM}|{RESET} "
+
+    parts = [
+        arc_label,
+        f"{progress_bar} {pct_color}{percentage}%{RESET} {DIM}▲{RESET}{format_tokens(tok_input_count)} {DIM}▼{RESET}{format_tokens(tok_output_count)}",
+        f"${dollars:.2f}",
+        format_duration(duration_ms),
+        f"{GREEN}+{added}{RESET}{RED}-{removed}{RESET}",
+    ]
+
+    return sep.join(parts)
+
+
+def log_failure():
+    try:
+        with open(ERROR_LOG, "a") as f:
+            f.write(f"--- {datetime.now().isoformat()} ---\n")
+            traceback.print_exc(file=f)
+    except OSError:
+        pass
+
+
+def main():
+    try:
+        data = json.load(sys.stdin)
+        line = render(data)
+    except Exception:
+        # Always exit 0 with some output — Claude Code suppresses the
+        # statusline after repeated failures and only retries on restart.
+        log_failure()
+        print("⌁")
+        return
+
+    print(line)
+
+
+if __name__ == "__main__":
+    main()

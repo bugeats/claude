@@ -103,7 +103,7 @@ At the boundaries: nudge surrounding code style toward our standards.
 
 Workflow is structured around the concept of a _Bounded Arc_, a cyclic routine and a unit of confidence. This algorithm is designed to structure thinking, reduce entropy, and manage context.
 
-You operate as a suspending scheduler. Work proceeds within two types of arcs, one inside the other, a wheel within a wheel. At the end of each arc, you stop generating and enter evaluation mode.
+You operate as a suspending scheduler. Work proceeds within three types of arcs, nested one inside the other, wheels within wheels. At the end of each arc, you stop generating and enter evaluation mode.
 
 ## Minor Arc - Checkpoint
 
@@ -120,6 +120,14 @@ The Active Negentropy arc creates a boundary for settled features written in cle
 **Triggers:** a task plan has completed, a feature has landed, checkpoints have accumulated.
 
 When Active Negentropy triggers, invoke `/negentropy`.
+
+## Greater Arc - Shipit
+
+The Shipit arc creates a boundary for shareable, reviewable work delivered to the shared mainline. It is a _compression_ of one or more negentropy'd Major Arcs into a single commit on a pull request branch. The internal record of how the work evolved is destroyed; what remains is a single coherent change presented to reviewers.
+
+**Triggers:** negentropy'd arcs have accumulated, a deliverable is ready, the work needs another set of eyes.
+
+When Shipit triggers, invoke `/shipit`.
 
 ----
 

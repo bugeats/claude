@@ -10,7 +10,7 @@ Structure your response as a guided tour:
 
 1. **The philosophy** — What is the Compression Principle and why does it govern everything? Explain it in plain language with a concrete example.
 
-2. **The rhythm** — What are the Arcs? Explain the checkpoint/negentropy cycle as a workflow the user will experience, not as abstract theory. Focus on what they'll see happen and when.
+2. **The rhythm** — What are the Arcs? Explain the three nested arcs (Minor/checkpoint, Major/negentropy, Greater/shipit) as a workflow the user will experience, not as abstract theory. Focus on what they'll see happen and when.
 
 3. **The skills** — List every `/skill` available in this session. For each, one sentence on when and why to use it.
 

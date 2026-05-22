@@ -76,6 +76,7 @@
               pkgs.gnugrep
               pkgs.coreutils
               pkgs.git
+              pkgs.gh
               pkgs.ripgrep
               pkgs.python3
               pkgs.figlet

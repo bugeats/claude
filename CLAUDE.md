@@ -24,6 +24,7 @@ skills/checkpoint/SKILL.md   # → ~/.claude/skills/ (tidy, consolidate, doc, co
 skills/negentropy/SKILL.md   # → ~/.claude/skills/ (DCG-driven fixed-point compression + rebase)
 skills/nix/SKILL.md          # → ~/.claude/skills/ (nix build, run, status interface)
 skills/school-me/SKILL.md    # → ~/.claude/skills/ (guided tour of this config's workflow)
+skills/shipit/SKILL.md       # → ~/.claude/skills/ (rebase, squash, branch, push, open PR)
 tools/nix-status.sh          # → ~/.claude/tools/ (show active nix builds, sandbox dirs, daemon workers)
 tools/checkpoint-range.sh    # → ~/.claude/tools/ (find CHECKPOINT commit range for negentropy rebase)
 statusline.py                # → ~/.claude/ (status line: arc depth, git branch, model, context, cost, churn)
@@ -55,15 +56,15 @@ Skills (inside a Claude session, targeting the project flake):
 
 ## Current Focus
 
-Bootstrap lifecycle, default permissions, and Rust tooling integration are landed. `/nix` skill has `build` (background agent), `run` (project flake apps), and `status` (build monitoring) subcommands. Tools in `tools/` are defined in this repo and shipped to `~/.claude/tools/` via bootstrap. No flake apps — all tools are bootstrap-managed scripts.
-
-`/negentropy` Phase 2 includes a runtime-entropy lens alongside the Compression Principle. The lens parallels the upstream `/simplify` skill but is owned in-tree — invoking `/simplify` from `/checkpoint` would discourage frequent checkpoints (three-agent fan-out per minor arc), and depending on it from any arc ties our shipped workflow to a tool we don't author.
+Three arcs ship: `/checkpoint` (Minor), `/negentropy` (Major), `/shipit` (Greater). Tools in `tools/` are bootstrap-managed scripts, not flake apps. `/negentropy` Phase 2 includes a runtime-entropy lens alongside the Compression Principle — owned in-tree rather than delegating to `/simplify`, since fanning out three review agents per minor arc would discourage frequent checkpoints.
 
 `statusline.py` delegates arc counting to `tools/checkpoint-range.sh --count` so the gauge and `/negentropy` rebase share one algorithm. The script wraps its body in a top-level guard, appends tracebacks to `~/.claude/statusline.log`, and always exits 0 — Claude Code suppresses the status line after repeated failures and only retries on restart.
 
 Shipped defaults in `settings.json`: `permissions.defaultMode: "acceptEdits"`, `remoteControlAtStartup: true`, and no `model` pin — Claude Code's default already tracks the most capable model, so an explicit alias adds no stability over the default.
 
 `CLAUDE.system.md` is a parallel work surface — the shipped guidance itself. Tightening shipped guidance is fair game at any checkpoint.
+
+`/shipit` is the Greater Arc: a compression of negentropy'd Major Arcs into one commit on a PR branch named `<kebab-identity>/pr/<feature-tag>`. It refuses to run if CHECKPOINT commits remain in `origin/main..HEAD`, keeping the arc layering clean — each skill owns one phase transition. Identity is kebab-cased at runtime from `~/.claude/identity`; no second file.
 
 **`writeShellApplication` discipline**: `bootstrap.sh` runs under `set -o errexit nounset pipefail`. Guard `&&` chains in functions with `if` statements — a short-circuiting `&&` chain as the last statement in a `for` loop inside a function propagates non-zero to the call site. Files from `/nix/store/` have `444` permissions — tools and hooks use `install -m 0755` to get executable copies; skills and statusline remain symlinks (read-only is fine).
 

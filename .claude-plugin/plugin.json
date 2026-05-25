@@ -1,0 +1,9 @@
+{
+  "name": "arcs",
+  "version": "0.1.0",
+  "description": "The Arcs workflow: checkpoint, negentropy, shipit, and supporting skills",
+  "author": { "name": "Chadwick Dahlquist" },
+  "homepage": "https://github.com/bugeats/claude",
+  "repository": "https://github.com/bugeats/claude",
+  "keywords": ["workflow", "arcs", "checkpoint", "negentropy", "shipit"]
+}

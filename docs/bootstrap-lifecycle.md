@@ -1,32 +1,37 @@
 # Bootstrap Lifecycle
 
-The bootstrap script loops over `skills/*/` and `hooks/*.sh` — adding or removing a skill/hook directory is sufficient; no manifest update needed.
+`bootstrap.sh` is a launcher, not an installer. It writes nothing to `~/.claude/` except the identity file on first run, then `exec`s Claude Code with `--plugin-dir`, `--settings`, and `--append-system-prompt-file` all pointing into the immutable Nix store path baked in as `FLAKE_SELF`. Multiple concurrent sessions on one host share the same store path safely; nothing is torn down on exit.
 
-## Artifact Management
+## Plugin Loading
 
-`remove_managed_artifacts` handles two categories of installed files:
+Skills, hooks, and MCP server registrations are discovered by Claude Code from `$FLAKE_SELF`:
 
-- **Symlinks** (statusline, skills, `~/CLAUDE.md`): removed only if they point into `/nix/store/`.
-- **Copied files** (settings, tools, hooks): removed unconditionally.
+- `.claude-plugin/plugin.json` — manifest (name, version, author).
+- `skills/<name>/SKILL.md` — auto-discovered slash commands.
+- `hooks/hooks.json` — `PreToolUse`/`PostToolUse` registrations referencing `${CLAUDE_PLUGIN_ROOT}/hooks/*.sh`.
+- `.mcp.json` — `rust-analyzer` stdio server.
 
-Runs on entry (stale cleanup) and on EXIT trap (via `on_exit`).
-
-## Settings
-
-`settings.json` is installed as a writable copy (not a symlink) so Claude Code can write back at runtime. The user's original is backed up to `settings.backup-pre-claude-arcs.json` and restored on exit. User-authored entries are preserved.
+`settings.json` and `CLAUDE.system.md` sit at the plugin root but reach Claude Code via explicit flags rather than the plugin discovery path. Inside `settings.json`, `statusLine.command` uses the bootstrap-exported `$CLAUDE_ARCS_ROOT` so it resolves into the same store path.
 
 ## Identity
 
-`~/.claude/identity` is created on first run (via `ensure_identity`, defaults to `whoami`) and persists across ephemeral invocations.
+`~/.claude/identity` is created on first run (`ensure_identity`, defaults to `whoami`) and persists across sessions. It's the only file in `~/.claude/` the bootstrap writes after migration.
+
+## v1 → v2 Migration
+
+`migrate_from_v1` removes artifacts staged by the pre-plugin bootstrap so they don't collide with plugin-scope hooks:
+
+- `~/.claude/settings.json`: restored from `settings.backup-pre-claude-arcs.json` when present; otherwise deleted if it's a symlink into `/nix/store/` or matches the v1 statusline command sentinel.
+- `~/.claude/statusline.py`, `~/CLAUDE.md`, and `~/.claude/skills/*/` symlinks into the store: removed.
+- `~/.claude/hooks/*.sh`, `~/.claude/tools/*.sh`, `~/.claude/cargo-workspace-root`: removed.
+- User-scope `rust-analyzer` MCP registration: removed via `claude mcp remove`.
+
+The function is idempotent — once the install base has cycled through it, it's dead code and should be deleted.
 
 ## Nix-interpolated Values
 
-`self`, `miniwi-font`, and `flakeUri` reach the script via `runtimeEnv` as `FLAKE_SELF`, `MINIWI_FONT`, `FLAKE_URI`.
-
-## MCP Servers
-
-Conditional — `find_cargo_root` walks from `$PWD` and registers rust-analyzer only when a `Cargo.toml` is found. The detected root persists to `~/.claude/cargo-workspace-root` (ephemeral) for `set_workspace`.
+`self` and `miniwi-font` reach the script via `runtimeEnv` as `FLAKE_SELF` and `MINIWI_FONT`. `writeShellApplication` adds `runtimeInputs` to the wrapped `PATH`, so all hooks and MCP servers inherit the same tool set as the bootstrap itself.
 
 ## Unmanaged State
 
-Everything else in `~/.claude/` (projects, history, sessions, cache, store.db, `statusline.log`) is mutable runtime state left unmanaged. `statusline.log` accumulates tracebacks when the status-line script catches an exception — checking it diagnoses a disappearing status bar.
+Everything else in `~/.claude/` (projects, history, sessions, cache, MCP auth, `statusline.log`) is mutable runtime state. `statusline.log` accumulates tracebacks when the status-line script catches an exception — checking it diagnoses a disappearing status bar.

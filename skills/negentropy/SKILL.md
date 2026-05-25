@@ -18,7 +18,7 @@ When you do this right, no new disorder is introduced to the codebase.
 
 ## Phase 1 — Assemble The DCG
 
-Run `~/.claude/tools/checkpoint-range.sh` to collect the checkpoint range and rebase base. If the tool exits non-zero, there are no checkpoints to process — report this and stop.
+Run `$CLAUDE_ARCS_ROOT/tools/checkpoint-range.sh` to collect the checkpoint range and rebase base. If the tool exits non-zero, there are no checkpoints to process — report this and stop.
 
 List the collected commits (hash + subject) and the rebase base before proceeding.
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Show active nix build processes and sandbox directories.
 
 show_nix_commands() {

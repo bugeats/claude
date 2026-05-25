@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Find the contiguous range of CHECKPOINT commits from HEAD for negentropy rebase.
 #
 # Walks backwards from HEAD up to DEPTH commits. Every CHECKPOINT: commit

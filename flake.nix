@@ -42,7 +42,6 @@
             ];
           };
           claude-code = claude-code-overlay.packages.${system}.claude;
-          flakeUri = "github:bugeats/claude";
           miniwi-font = pkgs.fetchurl {
             url = "https://raw.githubusercontent.com/xero/figlet-fonts/main/miniwi.flf";
             hash = "sha256-t9cGfmVdIEbU5sldhMOGMYxh4mFCWLGBfaCtvvZw/dk=";
@@ -87,7 +86,6 @@
             runtimeEnv = {
               MINIWI_FONT = "${miniwi-font}";
               FLAKE_SELF = "${self}";
-              FLAKE_URI = flakeUri;
             };
             text = builtins.readFile ./bootstrap.sh;
           };

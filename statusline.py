@@ -13,7 +13,8 @@ YELLOW = "\033[33m"
 RED = "\033[31m"
 PURPLE = "\033[38;2;179;136;255m"  # #B388FF — Claude brand accent
 
-CHECKPOINT_TOOL = os.path.expanduser("~/.claude/tools/checkpoint-range.sh")
+_HERE = os.path.dirname(os.path.realpath(__file__))
+CHECKPOINT_TOOL = os.path.join(_HERE, "tools", "checkpoint-range.sh")
 ERROR_LOG = os.path.expanduser("~/.claude/statusline.log")
 
 

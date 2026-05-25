@@ -165,7 +165,7 @@ If you reach for an external tool and it's not available, stop and add it to the
 
 Use `/nix build` for the primary debug loop. Use `/nix run <app-name>` for flake apps. Use `/nix` to see usage.
 
-Rust tooling (rust-analyzer MCP) is registered conditionally — only when the bootstrap detects a `Cargo.toml` above the working directory. When rust-analyzer tools are available, read `~/.claude/cargo-workspace-root` and call `set_workspace` with that path before first use.
+The rust-analyzer MCP is always registered. Before first use, walk up from `$PWD` to find the nearest `Cargo.toml` and call `set_workspace` with its containing directory. If no `Cargo.toml` exists in the ancestry, the project isn't a Rust workspace — don't invoke rust-analyzer tools.
 
 ----
 

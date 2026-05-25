@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "rust-analyzer": {
+      "type": "stdio",
+      "command": "rust-analyzer-mcp"
+    }
+  }
+}

@@ -2,7 +2,7 @@
 name: nix
 description: Nix build and run interface
 user-invocable: true
-argument-hint: [build|run|status] [target]
+argument-hint: "[build|run|status] [target]"
 ---
 
 Parse the first argument to dispatch:
@@ -10,7 +10,7 @@ Parse the first argument to dispatch:
 - No arguments → print this skill's usage summary and stop.
 - `build` → go to **Build**.
 - `run` → go to **Run**.
-- `status` → run `~/.claude/tools/nix-status.sh` synchronously and report the output.
+- `status` → run `$CLAUDE_ARCS_ROOT/tools/nix-status.sh` synchronously and report the output.
 - Anything else → treat as a build output name (shorthand for `build <arg>`).
 
 ## Build

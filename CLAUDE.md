@@ -1,39 +1,34 @@
 # Claude Arcs
 
-Nix flake that manages Claude Code user-level configuration. Invoked remotely via `nix run github:bugeats/claude --refresh` — no local clone required. The default package (`claude-bootstrap`) installs authored config into `~/.claude/`, launches `claude`, and cleans up on exit.
+Nix flake that ships Claude Code workflow as a **plugin**. Invoked remotely via `nix run github:bugeats/claude --refresh` — no local clone required. The default package (`claude-bootstrap`) prints a banner, performs a one-time v1 cleanup, and `exec claude --plugin-dir $FLAKE_SELF …`. Nothing is staged into `~/.claude/`; everything resolves directly from the immutable Nix store path. Multiple concurrent sessions on one host share the same store path safely.
 
 This is a shared distribution used by teammates and a growing circle of users, not a single-user dotfiles repo. Changes here affect everyone on next bootstrap.
 
-**Two CLAUDE files, two audiences**: this repo contains both `CLAUDE.md` (what you're reading) and `CLAUDE.system.md`. They serve different roles:
+**Two CLAUDE files, two audiences**:
 
-- **`CLAUDE.md`** — project instructions for *this repo only*. Claude reads it when working on claude-arcs itself. It describes the distribution's architecture, build commands, and open items.
-- **`CLAUDE.system.md`** — system-level instructions shipped to the client. Bootstrap symlinks it to `~/CLAUDE.md`, where Claude Code loads it for *every session, in every project*. It defines workflow, code style, and universal conventions.
-
-Skills (`skills/*/SKILL.md`), hooks (`hooks/*.sh`), and tools (`tools/*.sh`) ship to the client. Changes take effect on next bootstrap.
+- **`CLAUDE.md`** — project instructions for *this repo only*. Claude reads it when working on claude-arcs itself.
+- **`CLAUDE.system.md`** — system-level instructions shipped to the client. Bootstrap passes it via `--append-system-prompt-file`, so Claude Code merges it into the system prompt for every session, every project. It defines workflow, code style, and universal conventions.
 
 ## Architecture
 
 ```
 flake.nix                    # default package = claude-bootstrap wrapper
-bootstrap.sh                 # bootstrap lifecycle: config install, claude launch, teardown
-CLAUDE.system.md             # → ~/CLAUDE.md (system instructions, every session)
-CLAUDE.md                    # project instructions (this repo only)
-settings.json                # user-global settings + hook config (writable copy)
-diagram.txt                  # arc workflow diagram (displayed in greeting banner)
-skills/checkpoint/SKILL.md   # → ~/.claude/skills/ (tidy, consolidate, doc, commit)
-skills/negentropy/SKILL.md   # → ~/.claude/skills/ (DCG-driven fixed-point compression + rebase)
-skills/nix/SKILL.md          # → ~/.claude/skills/ (nix build, run, status interface)
-skills/school-me/SKILL.md    # → ~/.claude/skills/ (guided tour of this config's workflow)
-skills/shipit/SKILL.md       # → ~/.claude/skills/ (rebase, squash, branch, push, open PR)
-tools/nix-status.sh          # → ~/.claude/tools/ (show active nix builds, sandbox dirs, daemon workers)
-tools/checkpoint-range.sh    # → ~/.claude/tools/ (find CHECKPOINT commit range for negentropy rebase)
-statusline.py                # → ~/.claude/ (status line: arc depth, git branch, model, context, cost, churn)
-hooks/nix-format.sh          # → ~/.claude/hooks/ (PostToolUse: nixfmt via nix run)
-hooks/nix-guardian.sh        # → ~/.claude/hooks/ (PreToolUse: prompt before non-nix build commands)
-hooks/rust-format.sh         # → ~/.claude/hooks/ (PostToolUse: rustfmt via rust-toolchain PATH)
+bootstrap.sh                 # banner + v1 cleanup, then exec claude with plugin flags
+.claude-plugin/plugin.json   # plugin manifest (name="arcs", semver, author, …)
+hooks/hooks.json             # plugin-scope hook registrations (paths via ${CLAUDE_PLUGIN_ROOT})
+.mcp.json                    # plugin-scope MCP server registrations (rust-analyzer)
+settings.json                # passed via --settings; statusLine + permissions + remoteControl
+CLAUDE.system.md             # passed via --append-system-prompt-file
+diagram.txt                  # arc workflow diagram (banner)
+skills/<name>/SKILL.md       # auto-discovered by the plugin loader
+hooks/{nix-format,nix-guardian,rust-format}.sh   # invoked from hooks/hooks.json
+tools/{checkpoint-range,nix-status}.sh            # invoked from skills via $CLAUDE_ARCS_ROOT/tools/
+statusline.py                # invoked from settings.json via $CLAUDE_ARCS_ROOT/statusline.py
 ```
 
-See [docs/bootstrap-lifecycle.md](docs/bootstrap-lifecycle.md) for artifact management, settings, identity, MCP servers, and unmanaged state. See [docs/dependencies.md](docs/dependencies.md) for runtime inputs, Rust toolchain, and tool dependencies.
+The bootstrap exports `CLAUDE_ARCS_ROOT=$FLAKE_SELF` so skills and `settings.json` reference store paths without baking specific hashes into source. Inside `hooks/hooks.json` and `.mcp.json`, Claude Code's own `${CLAUDE_PLUGIN_ROOT}` substitution does the same job.
+
+See [docs/bootstrap-lifecycle.md](docs/bootstrap-lifecycle.md) for v1→v2 migration, identity, and unmanaged state. See [docs/dependencies.md](docs/dependencies.md) for runtime inputs.
 
 ## Usage
 
@@ -43,35 +38,43 @@ Bootstrap (from any shell — no local clone required):
 nix run github:bugeats/claude --refresh
 ```
 
+Validate plugin changes locally:
+
+```
+claude plugin validate .
+claude --plugin-dir . plugin details arcs
+```
+
 Skills (inside a Claude session, targeting the project flake):
 
 ```
 /nix                           # show nix skill usage
-/nix build                     # nix build --print-build-logs (background agent)
-/nix build my-foo              # nix build .#my-foo --print-build-logs (background agent)
-/nix run                       # nix run (default project app, synchronous)
-/nix run my-app                # nix run .#my-app (project flake app, synchronous)
+/nix build [target]            # nix build [.#target] --print-build-logs (background agent)
+/nix run [app]                 # nix run [.#app] (synchronous)
 /nix status                    # show active nix builds and sandbox dirs
 ```
 
 ## Current Focus
 
-Three arcs ship: `/checkpoint` (Minor), `/negentropy` (Major), `/shipit` (Greater). Tools in `tools/` are bootstrap-managed scripts, not flake apps. `/negentropy` Phase 2 includes a runtime-entropy lens alongside the Compression Principle — owned in-tree rather than delegating to `/simplify`, since fanning out three review agents per minor arc would discourage frequent checkpoints.
+Plugin v2 (`.claude-plugin/plugin.json` + `--plugin-dir`) just landed, replacing the stage-and-teardown bootstrap that broke under concurrent sessions. The next bootstrap is the first real smoke test; verify hook firing, statusline rendering, and skill resolution on a fresh `nix run --refresh`.
 
-`statusline.py` delegates arc counting to `tools/checkpoint-range.sh --count` so the gauge and `/negentropy` rebase share one algorithm. The script wraps its body in a top-level guard, appends tracebacks to `~/.claude/statusline.log`, and always exits 0 — Claude Code suppresses the status line after repeated failures and only retries on restart.
+Three arcs ship: `/checkpoint` (Minor), `/negentropy` (Major), `/shipit` (Greater). `/negentropy` Phase 2 includes a runtime-entropy lens alongside the Compression Principle — owned in-tree rather than delegating to `/simplify`, since fanning out three review agents per minor arc would discourage frequent checkpoints.
 
-Shipped defaults in `settings.json`: `permissions.defaultMode: "acceptEdits"`, `remoteControlAtStartup: true`, and no `model` pin — Claude Code's default already tracks the most capable model, so an explicit alias adds no stability over the default.
+`statusline.py` resolves `tools/checkpoint-range.sh` via `__file__`-relative lookup so the gauge and `/negentropy` rebase share one algorithm. The script wraps its body in a top-level guard, appends tracebacks to `~/.claude/statusline.log`, and always exits 0 — Claude Code suppresses the status line after repeated failures and only retries on restart.
+
+Shipped defaults in `settings.json`: `permissions.defaultMode: "acceptEdits"`, `remoteControlAtStartup: true`, no `model` pin. `statusLine.command` references `$CLAUDE_ARCS_ROOT/statusline.py`; Claude Code shell-expands the variable at invocation time.
 
 `CLAUDE.system.md` is a parallel work surface — the shipped guidance itself. Tightening shipped guidance is fair game at any checkpoint.
 
-`/shipit` is the Greater Arc: a compression of negentropy'd Major Arcs into one commit on a PR branch named `<kebab-identity>/pr/<feature-tag>`. It refuses to run if CHECKPOINT commits remain in `origin/main..HEAD`, keeping the arc layering clean — each skill owns one phase transition. Identity is kebab-cased at runtime from `~/.claude/identity`; no second file.
+`/shipit` is the Greater Arc: a compression of negentropy'd Major Arcs into one commit on a PR branch named `<kebab-identity>/pr/<feature-tag>`. It refuses to run if CHECKPOINT commits remain in `origin/main..HEAD`. Identity is kebab-cased at runtime from `~/.claude/identity`.
 
-**`writeShellApplication` discipline**: `bootstrap.sh` runs under `set -o errexit nounset pipefail`. Guard `&&` chains in functions with `if` statements — a short-circuiting `&&` chain as the last statement in a `for` loop inside a function propagates non-zero to the call site. Files from `/nix/store/` have `444` permissions — tools and hooks use `install -m 0755` to get executable copies; skills and statusline remain symlinks (read-only is fine).
+**`writeShellApplication` discipline**: `bootstrap.sh` runs under `set -o errexit nounset pipefail`. Shellcheck disable directives must sit above a complete compound command (not on an `elif`); factor out a helper if needed. Guard `&&` chains in functions with `if` statements — a short-circuiting chain as the last statement in a `for` loop inside a function propagates non-zero to the call site.
 
 Open items:
 
-- **Color tuning**: Brand purple `#B388FF` is approximate — verify against actual Claude Code TUI source if possible.
-- **Hook verification**: `$HOME` expansion in hook command path untested. Hook stdin JSON schema (`tool_input.command`, `tool_input.file_path`) confirmed via docs but not verified at runtime.
-- **System flake integration**: Remote invocation via `nix run github:bugeats/claude --refresh` is the primary usage path. Inclusion in a system flake via `packages.default` is untested.
+- **v1→v2 cleanup window**: `migrate_from_v1` runs on every bootstrap. Once the install base has cycled through it, the function and its helper become dead code and should be deleted.
+- **Plugin namespace collisions**: if a user already has a user-scope skill named `checkpoint`/`negentropy`/`shipit`/`nix`/`school-me`, the resolution order under `--plugin-dir` is undocumented. Verify, then document.
+- **Color tuning**: brand purple `#B388FF` is approximate — verify against Claude Code TUI source if possible.
+- **System flake integration**: remote invocation via `nix run github:bugeats/claude --refresh` is the primary path. Inclusion in a system flake via `packages.default` is untested.
 - **Permission rule semantics**: `Bash(nix:*)` colon syntax matches `nix` subcommands but not hyphenated binaries like `nix-prefetch-github`.
-- **MCP lifecycle verification**: `claude mcp add-json`/`remove` subcommands used in bootstrap — untested at runtime. Fallback: direct `jq` manipulation of `~/.claude.json`.
+- **rust-analyzer eagerness**: the plugin registers rust-analyzer unconditionally via `.mcp.json`. The MCP server starts lazily on first tool call — confirmed by component-inventory note but not stress-tested across non-Rust projects.

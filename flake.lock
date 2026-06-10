@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1781026631,
-        "narHash": "sha256-qyce0vA13NM6TL7Nm3binmGCx/AQw2Ms7ZnXf/hFkww=",
+        "lastModified": 1781114337,
+        "narHash": "sha256-zarjbsqTtFa5vfEDYGdiAJ/qQeBx9krJN1jMyhG1flg=",
         "owner": "ryoppippi",
         "repo": "claude-code-overlay",
-        "rev": "6b680cfac93a57860ee25e5ea5a70e58c6bb6724",
+        "rev": "3e9711107c336880caaaefef28dedc30a3bd09d4",
         "type": "github"
       },
       "original": {
@@ -48,11 +48,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780975129,
-        "narHash": "sha256-428T1pLXnbVeUgZx2wWEkbvl3ZORjras34ANZ3ACp5A=",
+        "lastModified": 1781061510,
+        "narHash": "sha256-tVuGHgt/TsWu1rUAqEL+eWRIJJHtiPE2+yQ63b+/WTU=",
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "rev": "fe64e6b409dc513274d2941f8da13bbd0fdcf44e",
+        "rev": "d286e9691bb03045febbf8304a658eab1487d1b5",
         "type": "github"
       },
       "original": {

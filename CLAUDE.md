@@ -21,6 +21,7 @@ settings.json                # passed via --settings; statusLine + permissions +
 CLAUDE.system.md             # passed via --append-system-prompt-file
 diagram.txt                  # arc workflow diagram (banner)
 skills/<name>/SKILL.md       # auto-discovered by the plugin loader
+style/<lang>.md              # language review criteria, read during /checkpoint Step 1
 hooks/{nix-format,nix-guardian,rust-format}.sh   # invoked from hooks/hooks.json
 tools/{checkpoint-range,nix-status}.sh            # invoked from skills via $CLAUDE_ARCS_ROOT/tools/
 statusline.py                # invoked from settings.json via $CLAUDE_ARCS_ROOT/statusline.py
@@ -66,9 +67,11 @@ Shipped defaults in `settings.json`: `permissions.defaultMode: "acceptEdits"`, `
 
 `CLAUDE.system.md` is a parallel work surface — the shipped guidance itself. Tightening shipped guidance is fair game at any checkpoint.
 
+Language-specific style is tiered by cost-of-late-detection: mechanical rules → PostToolUse hooks (edit time); surface judgment → `style/<lang>.md` read during `/checkpoint` Step 1 (arc close, deliberately withheld from generation time — review compliance beats generation compliance); structural rules → Universal Code Style in `CLAUDE.system.md` (generation time, must stay tiny). `style/rust.md` seeds the middle tier; add languages by file drop, no prompt or skill edit needed. Crate-gated subsections (`## Tracing` — "for projects using the `tracing` crate") scope rules below the language level; reuse that pattern rather than splitting files per crate.
+
 `/shipit` is the Greater Arc: a compression of negentropy'd Major Arcs into one commit on a PR branch named `<kebab-identity>/pr/<feature-tag>`. It refuses to run if CHECKPOINT commits remain in `origin/main..HEAD`. Identity is kebab-cased at runtime from `~/.claude/identity`.
 
-**`writeShellApplication` discipline**: `bootstrap.sh` runs under `set -o errexit nounset pipefail`. Shellcheck disable directives must sit above a complete compound command (not on an `elif`); factor out a helper if needed. Guard `&&` chains in functions with `if` statements — a short-circuiting chain as the last statement in a `for` loop inside a function propagates non-zero to the call site.
+See [docs/shell-style.md](docs/shell-style.md) for `writeShellApplication` discipline.
 
 Open items:
 

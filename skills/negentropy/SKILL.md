@@ -35,11 +35,11 @@ List this scope explicitly before proceeding.
 
 ## Phase 2 — Fixed-point Compression
 
-Apply two lenses to the assembled scope: **source entropy** (the Compression Principle) and **runtime entropy**. This is an iterative process:
+Apply two lenses to the assembled scope: **source entropy** and **runtime entropy**. This is an iterative process:
 
-- Examine the modification surface for **source entropy**. Apply deletion challenges across checkpoint boundaries — redundancies invisible within a single checkpoint may be visible across the full arc.
+- Examine the modification surface for **source entropy**. Apply Compression Principle challenges and Universal Code Style across checkpoint boundaries — redundancies invisible within a single checkpoint may be visible across the full arc.
 
-- Examine the modification surface for **runtime entropy**. Source compression does not catch execution cost. Apply deletion challenges to:
+- Examine the modification surface for **runtime entropy**. Source compression does not catch execution cost. Apply Compression Principle challenges, including:
   - Unnecessary work — redundant computation, repeated reads, N+1 patterns
   - Missed concurrency — independent operations forced sequential
   - Hot-path bloat — new blocking work in startup or per-request/per-render paths
@@ -78,8 +78,6 @@ Squash:
 git reset --soft <base-commit> && git commit
 ```
 
-Verify with `git log --oneline -5` after the commit.
-
-If the final diff does not satisfy the Compression Principle — if there are lines you would challenge in code review, then you are not done.
+If the final diff does not satisfy the Compression Principle and Universal Code Style — if there are lines you would challenge in code review, then you are not done.
 
 After all phases complete, summarize what changed and resume the prior task.

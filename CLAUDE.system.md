@@ -34,11 +34,11 @@ Use the type system to **make invalid states unrepresentable**. When an invarian
 
 Functional style within language idioms: transformation over mutation, small pure functions over stateful methods, composition over inheritance. Mutation is an exceptional condition and requires a **why** explainer inline.
 
-One function, one job. A body performing multiple jobs is a decomposition site — sometimes by extracting a helper, sometimes by tightening the types so the alternatives collapse.
-
-The _Evergreen Rule_: comments explain **why**, never _what_ or _how_.
+One function, one job. A body performing multiple jobs is a decomposition site — sometimes by extracting a helper, sometimes by tightening the types so the alternatives collapse. A function that spans more than a page (~60 lines) is never ok and must be decomposed.
 
 Blank lines are structural punctuation. Separate blocks (`if`, `for`, `match`, `{}`), variable clusters, and function definitions with a blank line so each element breathes against its neighbors. Adjacent blocks without separation read as a run-on sentence.
+
+The _Evergreen Rule_: comments explain **why**, never _what_ or _how_.
 
 All fallible boundaries propagate typed errors.
 
@@ -109,7 +109,7 @@ You operate as a suspending scheduler. Work proceeds within three types of arcs,
 
 The checkpoint arc creates a boundary for aggressive context consolidation: a coherent unit of confidence. Err towards frequent checkpoints. Token budget is not a concern, and when we do this right, we maximize token value.
 
-**Triggers:** a test suite pass, a bug resolved, a function change, a trait implementation, a surprising discovery, a module-level refactor — and you are about to move to the next. If you are uncertain whether you've reached a checkpoint boundary, you have.
+**Triggers:** a test suite pass, a bug resolved, a function change, a trait implementation, a surprising discovery, a module-level refactor — and you are about to move to the next. Checkpoint at will. If you are uncertain whether you've reached a checkpoint boundary, you have.
 
 When a Checkpoint triggers, invoke `/checkpoint` to commit. The Arc is not complete until `/checkpoint` has been invoked. Never advance to the next unit of work with uncommitted changes.
 
@@ -125,9 +125,7 @@ When Active Negentropy triggers, invoke `/negentropy`.
 
 The Shipit arc creates a boundary for shareable, reviewable work delivered to the shared mainline. It is a _compression_ of one or more negentropy'd Major Arcs into a single commit on a pull request branch. The internal record of how the work evolved is destroyed; what remains is a single coherent change presented to reviewers.
 
-**Triggers:** negentropy'd arcs have accumulated, a deliverable is ready, the work needs another set of eyes.
-
-When Shipit triggers, invoke `/shipit`.
+**Triggers:** always initiated manually with `/shipit` by the user, never automatic.
 
 ----
 
@@ -144,6 +142,14 @@ Documentation is aggressively DRY: tests are the canonical usage examples, types
 CLAUDE.md exists to bootstrap the next session. It must always have a clear **current focus**. Write it for your future self. The Compression Principle applies.
 
 Git history _is_ the changelog. Do not create CHANGELOG.md or similar files.
+
+### Plans & Task Naming
+
+Task nodes are identified with `SLUG-N`, nested by dots. Example: `FOOO-23.BARR-19.BAZZ-1`. The full dotted path is the handle. A `SLUG` is four letters, mnemonic, chosen at plan creation. One slug per plan or sub-plan; never per step.
+
+`N` is append-only per slug: a new node takes max existing N plus one and is placed positionally. Never renumber, reuse, or derive order from the number — position carries order. When max N is uncertain, skip ahead: gaps are free, reuse is the only sin.
+
+The docs are the registry — re-derive max N by reading them.
 
 ## Gathering Context
 

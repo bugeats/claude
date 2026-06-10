@@ -19,19 +19,21 @@ Execute all steps in order:
 
 ## Step 1 — Atomic Tidy
 
-Enumerate the Working Set and apply the Compression Principle to each. This is your opportunity to make "the smallest reasonable change" smaller.
+Enumerate the Working Set and apply the Compression Principle. All code must be reviewed in accordance with Universal Code Style. Make edits as needed.
+
+List `$CLAUDE_ARCS_ROOT/style/` and, for each language present in the Working Set that has a matching `<lang>.md`, read it now — even if read in a prior arc — and apply it as review criteria to the diff. These rules are deliberately withheld from generation time; this re-read is their only enforcement point.
 
 ## Step 2 — Persist Context
 
-Rewrite the project-level CLAUDE.md for the next session, check for accuracy and make corrections.
+Rewrite the project-level CLAUDE.md for the next session, check for accuracy and make corrections. Ensure there is a "Current Focus" section at the end of the project CLAUDE.md and that it is written to reflect where work stands after this checkpoint.
 
 Purge sections no longer relevant to active work:
 
-1. Identify sections that don't serve the current focus.
+1. Identify sections that don't serve the Current Focus.
 2. Move each to `docs/<kebab-case-name>.md`.
-3. Replace the section with a link to the new file.
+3. Optional: replace sections with a link to the new file.
 
-Ensure there is a "Current Focus" section at the end of the project CLAUDE.md and that it is written to reflect where work stands after this checkpoint.
+Items in the Current Focus that are resolved or completed should be purged. Focus is about reducing noise.
 
 ## Step 3 — Persist History
 

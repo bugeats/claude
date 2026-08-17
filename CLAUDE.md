@@ -61,7 +61,7 @@ Plugin v2 (`.claude-plugin/plugin.json` + `--plugin-dir`) just landed, replacing
 
 Three arcs ship: `/checkpoint` (Minor), `/negentropy` (Major), `/shipit` (Greater). `/negentropy` Phase 2 includes a runtime-entropy lens alongside the Compression Principle — owned in-tree rather than delegating to `/simplify`, since fanning out three review agents per minor arc would discourage frequent checkpoints.
 
-`statusline.py` resolves `tools/checkpoint-range.sh` via `__file__`-relative lookup so the gauge and `/negentropy` rebase share one algorithm. The script wraps its body in a top-level guard, appends tracebacks to `~/.claude/statusline.log`, and always exits 0 — Claude Code suppresses the status line after repeated failures and only retries on restart.
+`statusline.py` resolves `tools/checkpoint-range.sh` via `__file__`-relative lookup so the gauge and `/negentropy` rebase share one algorithm. The walk is bounded at the mainline merge-base so published commits never enter a rebase range; the checked-out branch is skipped as a mainline candidate so local-only repos committing on `main` still see their own range. The script wraps its body in a top-level guard, appends tracebacks to `~/.claude/statusline.log`, and always exits 0 — Claude Code suppresses the status line after repeated failures and only retries on restart.
 
 Shipped defaults in `settings.json`: `permissions.defaultMode: "acceptEdits"`, `remoteControlAtStartup: true`, no `model` pin. `statusLine.command` references `$CLAUDE_ARCS_ROOT/statusline.py`; Claude Code shell-expands the variable at invocation time.
 

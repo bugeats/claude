@@ -27,6 +27,21 @@
     {
       formatter = eachSystem (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
 
+      # bootstrap.sh is linted at build time by writeShellApplication; this
+      # covers the shell files shipped as-is.
+      checks = eachSystem (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          shellcheck = pkgs.runCommand "shellcheck" { nativeBuildInputs = [ pkgs.shellcheck ]; } ''
+            shellcheck ${self}/tools/*.sh ${self}/hooks/*.sh
+            touch $out
+          '';
+        }
+      );
+
       packages = eachSystem (
         system:
         let

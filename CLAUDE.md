@@ -57,7 +57,7 @@ Skills (inside a Claude session, targeting the project flake):
 
 ## Current Focus
 
-Plugin v2 (`.claude-plugin/plugin.json` + `--plugin-dir`) just landed, replacing the stage-and-teardown bootstrap that broke under concurrent sessions. The next bootstrap is the first real smoke test; verify hook firing, statusline rendering, and skill resolution on a fresh `nix run --refresh`.
+Plugin v2 (`.claude-plugin/plugin.json` + `--plugin-dir`) just landed, replacing the stage-and-teardown bootstrap that broke under concurrent sessions. PostToolUse hooks are confirmed firing in real use; statusline rendering and skill resolution still need verification on a fresh `nix run --refresh`.
 
 Three arcs ship: `/checkpoint` (Minor), `/negentropy` (Major), `/shipit` (Greater). `/negentropy` Phase 2 includes a runtime-entropy lens alongside the Compression Principle — owned in-tree rather than delegating to `/simplify`, since fanning out three review agents per minor arc would discourage frequent checkpoints.
 
@@ -81,3 +81,4 @@ Open items:
 - **System flake integration**: remote invocation via `nix run github:bugeats/claude --refresh` is the primary path. Inclusion in a system flake via `packages.default` is untested.
 - **Permission rule semantics**: `Bash(nix:*)` colon syntax matches `nix` subcommands but not hyphenated binaries like `nix-prefetch-github`.
 - **rust-analyzer eagerness**: the plugin registers rust-analyzer unconditionally via `.mcp.json`. The MCP server starts lazily on first tool call — confirmed by component-inventory note but not stress-tested across non-Rust projects.
+- **rustfmt edition hardcode**: the format hook passes `--edition 2024` (standalone rustfmt otherwise defaults to 2015 and rejects `async fn`). Legacy 2015-edition crates using `async`/`try`/`dyn` as identifiers would fail to parse; if that ever bites, read the edition from the nearest `Cargo.toml` instead.

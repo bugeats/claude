@@ -69,12 +69,13 @@ Shipped defaults in `settings.json`: `permissions.defaultMode: "acceptEdits"`, `
 
 Language-specific style is tiered by cost-of-late-detection: mechanical rules → PostToolUse hooks (edit time); surface judgment → `style/<lang>.md` read during `/checkpoint` Step 1 (arc close, deliberately withheld from generation time — review compliance beats generation compliance); structural rules → Universal Code Style in `CLAUDE.system.md` (generation time, must stay tiny). `style/rust.md` seeds the middle tier; add languages by file drop, no prompt or skill edit needed. Crate-gated subsections (`## Tracing` — "for projects using the `tracing` crate") scope rules below the language level; reuse that pattern rather than splitting files per crate.
 
-`/shipit` is the Greater Arc: a compression of negentropy'd Major Arcs into one commit on a PR branch named `<kebab-identity>/pr/<feature-tag>`. It refuses to run if CHECKPOINT commits remain in `origin/main..HEAD`. Identity is kebab-cased at runtime from `~/.claude/identity`.
+`/shipit` is the Greater Arc: a compression of negentropy'd Major Arcs into one commit on a PR branch named `<kebab-identity>/pr/<feature-tag>`. It refuses to run if CHECKPOINT commits remain in `origin/main..HEAD`. Identity is kebab-cased at runtime from `~/.claude/identity`. It is stack-aware: a pending PR whose commits are all patch-contained in local history (`git cherry`) becomes the base, and `gh stack link` registers the chain. Post-ship, the original branch adopts the PR branch's history, so it reads main + pending stack + one crystallized commit, and squash-merged PRs drop from it by patch-id on rebase.
 
 See [docs/shell-style.md](docs/shell-style.md) for `writeShellApplication` discipline.
 
 Open items:
 
+- **Stack flow untested**: `/shipit` stack detection (`git cherry` containment), `gh stack link` registration, and the Phase 7 reset-sync have not run against a real stacked PR. Exercise on the next multi-PR feature.
 - **v1→v2 cleanup window**: `migrate_from_v1` runs on every bootstrap. Once the install base has cycled through it, the function and its helper become dead code and should be deleted.
 - **Plugin namespace collisions**: if a user already has a user-scope skill named `checkpoint`/`negentropy`/`shipit`/`nix`/`school-me`, the resolution order under `--plugin-dir` is undocumented. Verify, then document.
 - **Color tuning**: brand purple `#B388FF` is approximate — verify against Claude Code TUI source if possible.

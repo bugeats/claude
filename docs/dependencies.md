@@ -4,7 +4,9 @@ All runtime packages are declared in `flake.nix` `runtimeInputs` — no ambient 
 
 ## Runtime Inputs
 
-`claude`, `jq`, `grep`, `git`, `rg`, `coreutils`, `python3`, `figlet`, `tte`, `rust-toolchain`, `rust-analyzer-mcp`
+`claude`, `gh`, `jq`, `grep`, `git`, `rg`, `coreutils`, `python3`, `figlet`, `tte`, `rust-toolchain`, `rust-analyzer-mcp`
+
+The `gh-stack` extension is user-level state, not shipped by the flake; `/shipit` uses it for stack registration when present and degrades to plain `--base` targeting when absent.
 
 ## Tools
 

@@ -33,6 +33,11 @@
     ],
     "defaultMode": "acceptEdits"
   },
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
   "autoMemoryEnabled": false,
   "remoteControlAtStartup": true,
   "statusLine": {

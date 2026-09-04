@@ -16,7 +16,7 @@ Claude Code discovers plugin components from `<plugin>`:
 - `skills/<name>/SKILL.md` — auto-discovered slash commands. Skill bodies reference plugin files via `${CLAUDE_PLUGIN_ROOT}`, which Claude Code substitutes anywhere in skill content.
 - `hooks/hooks.json` — `PreToolUse`/`PostToolUse` registrations referencing `${CLAUDE_PLUGIN_ROOT}/hooks/*.sh`.
 - `.mcp.json` — `rust-analyzer` stdio server, generated at build from `flake.nix` with an absolute store path as `command`.
-- `output-styles/{manual,auto}.md` — generated at build from `prompts/`; selectable in `/config` as `arcs:manual` and `arcs:auto`. Nothing is injected into the system prompt unless one is selected.
+- `output-styles/{manual,auto}.md` — generated at build from `prompts/`; selectable in `/config` as `arcs:manual` and `arcs:auto`. Nothing is injected into the system prompt unless one is selected. Headless selection: `--settings '{"outputStyle":"arcs:auto"}'`.
 
 `settings.json` sits at the plugin root but is outside plugin discovery, so it reaches Claude Code via the `--settings` flag. Its `statusLine.command` is an absolute store path substituted at build (`@out@` in source).
 

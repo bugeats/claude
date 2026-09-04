@@ -8,17 +8,17 @@ Announce: `Arc Close: 💎 Active Negentropy — We Now Crystallize Intent`
 
 You are now operating as a suspended scheduler that has switched to evaluation mode. This is not a formality. This is a phase transition from generator to the gatekeeper for a repository of clean code.
 
-If the current Arc has not been bounded, then stop, perform a /checkpoint, and return here with `/negentropy`.
+If the current Arc has not been bounded, then stop, perform a /arcs:checkpoint, and return here with `/arcs:negentropy`.
 
 Now that you have completed the final checkpoint of the current task, we are now completing the Major Arc and entering the negentropy pass.
 
-This is not a review. This is a _restarting scheduler_ that re-evaluates the entire arc of work as a single _demanded computation graph_ assembled from all `/checkpoint` derived traces.
+This is not a review. This is a _restarting scheduler_ that re-evaluates the entire arc of work as a single _demanded computation graph_ assembled from all `/arcs:checkpoint` derived traces.
 
 When you do this right, no new disorder is introduced to the codebase.
 
 ## Phase 1 — Assemble The DCG
 
-Run `$CLAUDE_ARCS_ROOT/tools/checkpoint-range.sh` to collect the checkpoint range and rebase base. If the tool exits non-zero, there are no checkpoints to process — report this and stop.
+Run `${CLAUDE_PLUGIN_ROOT}/tools/checkpoint-range.sh` to collect the checkpoint range and rebase base. If the tool exits non-zero, there are no checkpoints to process — report this and stop.
 
 List the collected commits (hash + subject) and the rebase base before proceeding.
 

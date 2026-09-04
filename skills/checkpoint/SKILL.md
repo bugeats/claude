@@ -21,7 +21,7 @@ Execute all steps in order:
 
 Enumerate the Working Set and apply the Compression Principle. All code must be reviewed in accordance with Universal Code Style. Make edits as needed.
 
-List `$CLAUDE_ARCS_ROOT/style/` and, for each language present in the Working Set that has a matching `<lang>.md`, read it now — even if read in a prior arc — and apply it as review criteria to the diff. These rules are deliberately withheld from generation time; this re-read is their only enforcement point.
+List `${CLAUDE_PLUGIN_ROOT}/style/` and, for each language present in the Working Set that has a matching `<lang>.md`, read it now — even if read in a prior arc — and apply it as review criteria to the diff. These rules are deliberately withheld from generation time; this re-read is their only enforcement point.
 
 ## Step 2 — Persist Context
 
@@ -39,7 +39,7 @@ Items in the Current Focus that are resolved or completed should be purged. Focu
 
 Record a standard git commit with metadata hints for the _demanded computation graph_ of this checkpoint.
 
-These hints will be consumed during /negentropy passes.
+These hints will be consumed during `/arcs:negentropy` passes.
 
 Format:
 ```

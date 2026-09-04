@@ -50,6 +50,12 @@ def current_branch(cwd):
     return run_silent(cwd, ["git", "rev-parse", "--abbrev-ref", "HEAD"])
 
 
+def active_style(data):
+    # Plugin-bundled styles arrive namespaced as "<plugin>:<name>".
+    name = (data.get("output_style") or {}).get("name") or ""
+    return name.split(":", 1)[-1] or "default"
+
+
 def format_tokens(n):
     if n >= 1_000_000:
         return f"{n / 1_000_000:.1f}M"
@@ -87,7 +93,7 @@ def render(data):
     checkpoints = count_checkpoints(project_dir)
     branch = current_branch(project_dir)
 
-    arc_label = f"{PURPLE}Arcs ⌁{checkpoints}{RESET} {DIM}|{RESET} {model}"
+    arc_label = f"{PURPLE}{active_style(data)} ⌁{checkpoints}{RESET} {DIM}|{RESET} {model}"
 
     if branch:
         arc_label += f" {DIM}on{RESET} {branch}"

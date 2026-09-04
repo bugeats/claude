@@ -1,27 +1,23 @@
 # Dependencies
 
-All runtime packages are declared in `flake.nix` `runtimeInputs` — no ambient PATH assumptions.
+All runtime packages are declared in `flake.nix` — no ambient PATH assumptions beyond `nix`, `bash`, and `git` where noted.
 
-## Runtime Inputs
+## Launcher Inputs
 
-`claude`, `gh`, `jq`, `grep`, `git`, `rg`, `coreutils`, `python3`, `figlet`, `tte`, `rust-toolchain`, `rust-analyzer-mcp`
+`claude`, `coreutils`, `gh`, `git`, `grep`, `jq`, `rg`, `rust-toolchain`. These form the model's shell toolset.
 
 The `gh-stack` extension is user-level state, not shipped by the flake; `/shipit` uses it for stack registration when present and degrades to plain `--base` targeting when absent.
 
-## Tools
+## Hooks and Tools
 
-Scripts in `tools/` stay in the Nix store. Skills invoke them via `$CLAUDE_ARCS_ROOT/tools/<name>.sh`; `statusline.py` locates them `__file__`-relative. They run with bootstrap-provided `PATH` plus ambient system tools (`pgrep`, `ps`, `awk`, `find` assumed available).
+Each script under `hooks/` and `tools/` is a `writeShellApplication` with its own `runtimeInputs`, declared in the `scripts` attrset in `flake.nix`. Skills invoke tools via `${CLAUDE_PLUGIN_ROOT}/tools/<name>.sh`; `statusline.py` locates them `__file__`-relative. `nix-status.sh` calls `nix` from the host PATH.
 
 ## Rust Toolchain
 
 Provided by `oxalica/rust-overlay` tracking latest stable: rustc, cargo, rust-analyzer, rust-src, rustfmt, clippy.
 
-`rust-analyzer-mcp` is built from source via `rustPlatform.buildRustPackage` (pinned at v0.2.0, `zeenix/rust-analyzer-mcp`).
-
-## Fonts
-
-The miniwi figlet font is fetched via `pkgs.fetchurl` (hash-pinned, source: `xero/figlet-fonts`).
+`rust-analyzer-mcp` is built from source via `rustPlatform.buildRustPackage` (pinned at v0.2.0, `zeenix/rust-analyzer-mcp`) and wrapped so the toolchain's `rust-analyzer` is on its PATH.
 
 ## Formatting
 
-`nix-format.sh` runs `nixfmt-rfc-style` ephemerally via `nix run`. `rust-format.sh` uses `rustfmt` from the toolchain PATH.
+`nix-format.sh` runs the pinned `nixfmt`. `rust-format.sh` runs the toolchain's `rustfmt`.

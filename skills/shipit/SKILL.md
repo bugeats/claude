@@ -9,7 +9,7 @@ Announce: `Arc Close: 🏁 Shipit — We Now Cross The Threshold`
 
 You are now operating as a suspended scheduler that has switched to evaluation mode. This is not a formality. This is a phase transition from internal work to a shareable, reviewable deliverable.
 
-This is the Greater Arc: a _compression_ of one or more negentropy'd Major Arcs into a single commit on a pull request branch. By the time `/shipit` runs, each Major Arc upstream should already be a single clean commit. If checkpoints remain in the range, the input is not yet crystallized — stop and direct the user to `/negentropy` first.
+This is the Greater Arc: a _compression_ of one or more negentropy'd Major Arcs into a single commit on a pull request branch. By the time `/arcs:shipit` runs, each Major Arc upstream should already be a single clean commit. If checkpoints remain in the range, the input is not yet crystallized — stop and direct the user to `/arcs:negentropy` first.
 
 All rewriting happens on a fresh PR branch. The original branch is read, never written, until the final sync phase deliberately hands it the crystallized history.
 
@@ -23,7 +23,7 @@ Refuse to proceed if any of the following fail. Report the specific failure and 
 - A GitHub remote is configured (`gh repo view`).
 - `gh` is authenticated (`gh auth status`).
 - HEAD is ahead of `origin/main` (after `git fetch origin main`).
-- No CHECKPOINT commits exist in `origin/main..HEAD` — if any, direct the user to `/negentropy` first.
+- No CHECKPOINT commits exist in `origin/main..HEAD` — if any, direct the user to `/arcs:negentropy` first.
 
 Improvise additional checks if context suggests them (e.g. branch protection rules, missing PR template, dirty submodules).
 
@@ -56,10 +56,10 @@ From here, `<base>` names the chosen ref and `<base>..HEAD` is the shipped range
 
 Determine the PR branch name: `<kebab-identity>/pr/<feature-tag>`.
 
-The identity comes from `~/.claude/identity`. Kebab-case it at runtime:
+The identity comes from `git config user.name`. Kebab-case it at runtime; if it is empty, stop and ask the user to set it:
 
 ```
-identity=$(tr '[:upper:]' '[:lower:]' < ~/.claude/identity | sed 's/[^a-z0-9]\+/-/g; s/^-\+\|-\+$//g')
+identity=$(git config user.name | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]\+/-/g; s/^-\+\|-\+$//g')
 ```
 
 Derive the feature-tag with nuance:

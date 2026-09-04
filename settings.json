@@ -42,6 +42,6 @@
   "remoteControlAtStartup": true,
   "statusLine": {
     "type": "command",
-    "command": "$CLAUDE_ARCS_ROOT/statusline.py"
+    "command": "@out@/statusline.py"
   }
 }

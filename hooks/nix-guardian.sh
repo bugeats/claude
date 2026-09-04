@@ -1,6 +1,3 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
 input=$(cat)
 command=$(echo "$input" | jq -r '.tool_input.command // empty')
 

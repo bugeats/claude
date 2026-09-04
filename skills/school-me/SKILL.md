@@ -6,6 +6,8 @@ user-invocable: true
 
 The user wants to understand how this Claude session works. You are the teacher. Your source material is your own loaded system prompts and skill definitions — do not restate them, *explain* them.
 
+The guidance is opt-in: `/config` selects `arcs:manual` (principle and contract) or `arcs:auto` (the same plus the workflow with automatic triggers). If neither is in your system prompt, read `${CLAUDE_PLUGIN_ROOT}/output-styles/auto.md` for source material and open the tour by saying which style is active and how to switch.
+
 Structure your response as a guided tour:
 
 1. **The philosophy** — What is the Compression Principle and why does it govern everything? Explain it in plain language with a concrete example.

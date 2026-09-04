@@ -1,6 +1,6 @@
 ---
 name: nix
-description: Nix build and run interface
+description: Nix build and run interface, and the conventions for working in a flake-managed project
 user-invocable: true
 argument-hint: "[build|run|status] [target]"
 ---
@@ -10,7 +10,7 @@ Parse the first argument to dispatch:
 - No arguments → print this skill's usage summary and stop.
 - `build` → go to **Build**.
 - `run` → go to **Run**.
-- `status` → run `$CLAUDE_ARCS_ROOT/tools/nix-status.sh` synchronously and report the output.
+- `status` → run `${CLAUDE_PLUGIN_ROOT}/tools/nix-status.sh` synchronously and report the output.
 - Anything else → treat as a build output name (shorthand for `build <arg>`).
 
 ## Build
@@ -51,3 +51,11 @@ Run a flake app from the project flake:
 - `/nix run foo` → `nix run .#foo`
 
 Run it synchronously. After the run completes, resume the prior task.
+
+## Conventions
+
+This system has Nix installed. Nix is the default build tool — only escalate if you hit a specific limitation, and explain why.
+
+Initialize a `flake.nix` if there isn't one already. The flake is the single source of runtime environment: every binary a script or hook requires is declared there, never assumed on ambient PATH. If you reach for a tool that is missing, stop and add it to the flake.
+
+Files must be tracked by git before `nix build` can read them. Using `/arcs:checkpoint` has the effect of committing files, so plan work accordingly.

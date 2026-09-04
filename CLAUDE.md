@@ -38,11 +38,11 @@ claude --plugin-dir result plugin details arcs
 
 ## Design Decisions
 
-Three arcs ship: `/checkpoint` (Minor), `/negentropy` (Major), `/shipit` (Greater). `/negentropy` owns a runtime-entropy lens in-tree rather than delegating to `/simplify`, since fanning out three review agents per minor arc would discourage frequent checkpoints.
+Three arcs ship: `/checkpoint` (Minor), `/negentropy` (Major), `/shipit` (Greater). `/unwip` and `/fixme` are entry points into that loop, not arcs; each hands off to `/arcs:checkpoint` by name so it works under `arcs:manual`, where nothing triggers on its own. `/negentropy` owns a runtime-entropy lens in-tree rather than delegating to `/simplify`, since fanning out three review agents per minor arc would discourage frequent checkpoints.
 
 Language-specific style is tiered by cost-of-late-detection: mechanical rules → PostToolUse hooks (edit time); surface judgment → `style/<lang>.md` read at arc close, deliberately withheld from generation time because review compliance beats generation compliance; structural rules → Universal Code Style in `prompts/containment.md`, which must stay tiny. Add a language by dropping a file into `style/`. Crate-gated subsections (see `## Tracing` in `style/rust.md`) scope rules below the language level; reuse that pattern rather than splitting files per crate.
 
-The statusline gauge and the `/negentropy` rebase share `tools/checkpoint-range.sh` so they never disagree about the range. `statusline.py` always exits 0 and logs tracebacks to `~/.claude/statusline.log`, because Claude Code suppresses the status line after repeated failures.
+The statusline gauge, the `/negentropy` rebase, and `/unwip` (via `--wip`) share `tools/checkpoint-range.sh` so they never disagree about what counts as unshared history. `statusline.py` always exits 0 and logs tracebacks to `~/.claude/statusline.log`, because Claude Code suppresses the status line after repeated failures.
 
 ## Current Focus
 

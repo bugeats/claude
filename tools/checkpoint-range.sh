@@ -1,28 +1,47 @@
-# Find the contiguous range of CHECKPOINT commits from HEAD for negentropy rebase.
+# Find the range of commits from HEAD that collapses into one commit.
 #
 # Walks backwards from HEAD up to DEPTH commits, never crossing into history
 # shared with the mainline: published commits must not enter a rebase range,
-# even when a stale CHECKPOINT was merged without being crystallized. Every
-# CHECKPOINT: commit extends the range; non-checkpoint "orphans" between
-# checkpoints are included.
+# even when a stale CHECKPOINT was merged without being crystallized.
+#
+# Default mode collects the negentropy range: every CHECKPOINT: commit extends
+# it, and non-checkpoint "orphans" between checkpoints are included.
+#
+# With --wip: collect the unwip range instead — the contiguous run of WIP
+# commits at HEAD. A deliberately named commit is a boundary, so the walk stops
+# at the first non-WIP subject.
 #
 # Default output (stdout):
 #   Line 1:  base <hash>           — rebase target (parent of oldest in range)
 #   Line 2+: <hash> <subject>      — each commit in the range, newest first
 #
-# With --count: print just the number of CHECKPOINT commits in the range and
+# With --count: print just the number of matching commits in the range and
 # exit 0 (even when the count is zero). Used by the statusline gauge.
 #
 # Exit codes (default mode):
 #   0  range found
-#   1  no CHECKPOINT commits in the unshared range
+#   1  no matching commits in the unshared range
 
 DEPTH=50
 COUNT_ONLY=0
+CONTIGUOUS=0
+LABEL=CHECKPOINT
+MATCH='^CHECKPOINT:'
 
-if [ "${1:-}" = "--count" ]; then
-  COUNT_ONLY=1
-fi
+for arg in "$@"; do
+  case "$arg" in
+    --count) COUNT_ONLY=1 ;;
+    --wip)
+      CONTIGUOUS=1
+      LABEL=WIP
+      MATCH='^WIP([ :(]|$)'
+      ;;
+    *)
+      echo "Unknown argument: $arg" >&2
+      exit 2
+      ;;
+  esac
+done
 
 # The ref that defines published history: the remote's declared HEAD when set,
 # otherwise the first conventional mainline that exists. The checked-out
@@ -69,29 +88,31 @@ while IFS= read -r line; do
   subjects+=("$subject")
 done < <(git log --format='%h %s' -n "$DEPTH" "$(walk_range)" 2>/dev/null)
 
-deepest_checkpoint=-1
-total_checkpoints=0
+deepest_match=-1
+total_matches=0
 
 for i in "${!subjects[@]}"; do
-  if [[ "${subjects[$i]}" == CHECKPOINT:* ]]; then
-    deepest_checkpoint=$i
-    total_checkpoints=$((total_checkpoints + 1))
+  if [[ "${subjects[$i]}" =~ $MATCH ]]; then
+    deepest_match=$i
+    total_matches=$((total_matches + 1))
+  elif [ "$CONTIGUOUS" -eq 1 ]; then
+    break
   fi
 done
 
 if [ "$COUNT_ONLY" -eq 1 ]; then
-  echo "$total_checkpoints"
+  echo "$total_matches"
   exit 0
 fi
 
-if [ "$deepest_checkpoint" -eq -1 ]; then
-  echo "No CHECKPOINT commits in the unshared range." >&2
+if [ "$deepest_match" -eq -1 ]; then
+  echo "No $LABEL commits in the unshared range." >&2
   exit 1
 fi
 
-base_hash=$(git rev-parse "${commits[$deepest_checkpoint]}^")
+base_hash=$(git rev-parse "${commits[$deepest_match]}^")
 echo "base $base_hash"
 
-for i in $(seq 0 "$deepest_checkpoint"); do
+for i in $(seq 0 "$deepest_match"); do
   echo "${commits[$i]} ${subjects[$i]}"
 done

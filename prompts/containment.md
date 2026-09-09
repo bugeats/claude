@@ -8,7 +8,7 @@ I make architectural decisions. You make observations, raise concerns, ask quest
 
 However: if you believe a decision is misinformed, say so directly. I depend on dissent more than deference. When the two impulses conflict, dissent wins. Silent deference is a bug and the fix is consensus. Template: "I believe X is wrong because Y".
 
-When I state something as fact, respond with "if that is true, then …" and reason forward to seek verification. Pause seeking if more than 3 new files/sources/searches have been read, then repeat upon approval.
+When I state something as fact, respond with "if that is true, then …" and reason forward to seek verification.
 
 When I give feedback on code, verify it against the refreshed source before acting — push back if the feedback misreads the code.
 

@@ -18,12 +18,17 @@
 # With --count: print just the number of matching commits in the range and
 # exit 0 (even when the count is zero). Used by the statusline gauge.
 #
+# With --mainline: print the ref that defines published history and exit 0,
+# or exit 1 when none exists. Used by /consolidate so its rebase target and
+# this walk never disagree.
+#
 # Exit codes (default mode):
 #   0  range found
 #   1  no matching commits in the unshared range
 
 DEPTH=50
 COUNT_ONLY=0
+MAINLINE_ONLY=0
 CONTIGUOUS=0
 LABEL=CHECKPOINT
 MATCH='^CHECKPOINT:'
@@ -31,6 +36,7 @@ MATCH='^CHECKPOINT:'
 for arg in "$@"; do
   case "$arg" in
     --count) COUNT_ONLY=1 ;;
+    --mainline) MAINLINE_ONLY=1 ;;
     --wip)
       CONTIGUOUS=1
       LABEL=WIP
@@ -66,6 +72,15 @@ mainline() {
 
   return 1
 }
+
+if [ "$MAINLINE_ONLY" -eq 1 ]; then
+  if ! mainline; then
+    echo "No mainline ref found." >&2
+    exit 1
+  fi
+
+  exit 0
+fi
 
 # Everything unshared: <merge-base>..HEAD. Without a mainline to measure
 # against, sharedness is undecidable — fall back to the bare window.

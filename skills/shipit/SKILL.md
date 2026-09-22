@@ -9,13 +9,13 @@ Announce: `Arc Close: 🏁 Shipit — We Now Cross The Threshold`
 
 You are now operating as a suspended scheduler that has switched to evaluation mode. This is not a formality. This is a phase transition from internal work to a shareable, reviewable deliverable.
 
-This is the Greater Arc: a _compression_ of one or more negentropy'd Major Arcs into a single commit on a pull request branch. By the time `/arcs:shipit` runs, each Major Arc upstream should already be a single clean commit. If checkpoints remain in the range, the input is not yet crystallized — stop and direct the user to `/arcs:negentropy` first.
+This is the Greater Arc: a _compression_ of one or more negentropy'd Major Arcs into a single commit on a pull request branch. Checkpoints remaining in the range are crystallized on the way by `/arcs:consolidate`.
 
 All rewriting happens on a fresh PR branch. The original branch is read, never written, until the final sync phase deliberately hands it the crystallized history.
 
 ## Phase 1 — Pre-flight
 
-Record the current branch name — Phase 7 returns to it.
+Record the current branch name — Phase 6 returns to it.
 
 Refuse to proceed if any of the following fail. Report the specific failure and stop.
 
@@ -23,7 +23,6 @@ Refuse to proceed if any of the following fail. Report the specific failure and 
 - A GitHub remote is configured (`gh repo view`).
 - `gh` is authenticated (`gh auth status`).
 - HEAD is ahead of `origin/main` (after `git fetch origin main`).
-- No CHECKPOINT commits exist in `origin/main..HEAD` — if any, direct the user to `/arcs:negentropy` first.
 
 Improvise additional checks if context suggests them (e.g. branch protection rules, missing PR template, dirty submodules).
 
@@ -74,41 +73,15 @@ If the current branch already matches `<kebab-identity>/pr/*`, work in place. Ot
 git checkout -b <kebab-identity>/pr/<feature-tag>
 ```
 
-## Phase 4 — Rebase Over Base
+## Phase 4 — Consolidate
 
-Rebase the PR branch over `<base>`:
+Invoke `/arcs:consolidate <base>`. It crystallizes any remaining checkpoints, rebases the PR branch over `<base>` — already-shipped stack commits drop by patch-id — and squashes `<base>..HEAD` into one commit.
 
-```
-git rebase <base>
-```
+If it stops on an unresolvable conflict, return to the original branch, delete the PR branch, and stop.
 
-Local commits patch-equivalent to already-shipped stack commits drop automatically — expected and desired. Afterward, `<base>..HEAD` is exactly the new work.
+The squashed commit's summary becomes the PR title. If the deliverable did not fit in 72 characters, the scope is wrong — escalate to the user.
 
-If conflicts arise, **resolve them**. You have full context of the change set and the upstream — use it. Bias toward intent preservation: the local commits represent crystallized intent, the upstream represents the integration target.
-
-If you cannot resolve with confidence — both sides made intentional, semantically incompatible changes, and there is no clear winner — `git rebase --abort`, return to the original branch, delete the PR branch, surface the conflict to the user, and stop.
-
-## Phase 5 — Squash Crystallized
-
-All commits in `<base>..HEAD` collapse into a single commit. Compose the commit message from the full messages of every commit in the range.
-
-Format:
-```
-<imperative summary>
-
-- <descriptive bullet points (exempt from the evergreen rule)>
-```
-
-The imperative summary becomes the PR title. Keep it under 72 characters so GitHub does not truncate it in lists. If you cannot fit the deliverable in 72 characters, the scope is wrong — escalate to the user.
-
-Squash:
-```
-git reset --soft <base> && git commit
-```
-
-Verify with `git log --oneline <base>..HEAD` — there should be exactly one commit.
-
-## Phase 6 — Push And Open
+## Phase 5 — Push And Open
 
 Push with `--force-with-lease` (safe against unseen remote updates, allows updates to existing PR branches):
 
@@ -132,7 +105,7 @@ If the `gh-stack` extension is not installed, the `--base` targeting alone still
 
 Report the PR URL.
 
-## Phase 7 — Return And Sync
+## Phase 6 — Return And Sync
 
 Everything above the stack on the original branch was compressed into the PR commit; hand the branch the crystallized history so it stays rebase-clean:
 
@@ -143,10 +116,10 @@ git reset --hard <pr-branch>
 
 The reflog preserves the old tip. Skip this phase when shipping happened in place on a PR branch.
 
-The original branch now reads: main, then the pending stack, then one crystallized commit — patch-identical to the open PRs. As stack PRs squash-merge, a plain `git fetch origin main && git rebase origin/main` drops the merged commits by patch-id. Its next push needs `--force-with-lease`.
+The original branch now reads: main, then the pending stack, then one crystallized commit — patch-identical to the open PRs. As stack PRs squash-merge, `/arcs:consolidate` drops the merged commits by patch-id.
 
 ## After Shipping
 
-The PR branch's invariant is one commit. Review feedback is `git commit --amend` then `git push --force-with-lease`, followed by re-syncing the original branch as in Phase 7.
+The PR branch's invariant is one commit. Review feedback is `git commit --amend` then `git push --force-with-lease`, followed by re-syncing the original branch as in Phase 6.
 
 Resume the prior task.

@@ -55,10 +55,10 @@ From here, `<base>` names the chosen ref and `<base>..HEAD` is the shipped range
 
 Determine the PR branch name: `<kebab-identity>/pr/<feature-tag>`.
 
-The identity comes from `git config user.name`. Kebab-case it at runtime; if it is empty, stop and ask the user to set it:
+The identity is `git config arcs.identity`, falling back to `git config user.name`. Kebab-case it at runtime; if it is empty, stop and ask the user to set one:
 
 ```
-identity=$(git config user.name | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]\+/-/g; s/^-\+\|-\+$//g')
+identity=$({ git config arcs.identity || git config user.name; } | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]\+/-/g; s/^-\+\|-\+$//g')
 ```
 
 Derive the feature-tag with nuance:

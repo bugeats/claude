@@ -30,7 +30,7 @@ The plugin needs no environment from its launcher:
 
 ## Identity
 
-The containment prose and `/shipit` derive the user's name from `git config user.name`.
+The containment prose takes the user's first name from `git config user.name`. `/shipit` prefixes its PR branches with `git config arcs.identity` in kebab-case, falling back to `user.name`.
 
 ## Leftovers From Earlier Bootstraps
 

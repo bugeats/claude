@@ -89,10 +89,10 @@ Push with `--force-with-lease` (safe against unseen remote updates, allows updat
 git push --force-with-lease --set-upstream origin <branch>
 ```
 
-Open the pull request as ready (not draft). Title is the imperative summary. Body is the bullet list from the squashed commit message, verbatim. When stacked, target the parent's head branch:
+Open the pull request as ready (not draft). Title is the imperative summary. Body is the squashed commit message below its summary, verbatim, so a closing line that cites registry tasks links the PR to them. When stacked, target the parent's head branch:
 
 ```
-gh pr create --title "<summary>" --body "<bullets>" [--base <parent-head>]
+gh pr create --title "<summary>" --body "<body>" [--base <parent-head>]
 ```
 
 When stacked, register the chain on GitHub (creates a stack, or extends the parent's existing one):
@@ -119,6 +119,8 @@ The reflog preserves the old tip. Skip this phase when shipping happened in plac
 The original branch now reads: main, then the pending stack, then one crystallized commit — patch-identical to the open PRs. As stack PRs squash-merge, `/arcs:consolidate` drops the merged commits by patch-id.
 
 ## After Shipping
+
+Bring the Active Focus in `CLAUDE.local.md` up to date: the work now sits on an open pull request.
 
 The PR branch's invariant is one commit. Review feedback is `git commit --amend` then `git push --force-with-lease`, followed by re-syncing the original branch as in Phase 6.
 

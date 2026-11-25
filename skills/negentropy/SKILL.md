@@ -71,12 +71,16 @@ Format:
 - <descriptive bullet points (exempt from the evergreen rule)>
 ```
 
+When the checkpoints cite registry tasks, close the message with a line naming them in the form the tracker links on (`Fixes ENG-12`, `Refs #34`), or as bare IDs for `docs/tasks.md`.
+
 Omit the `Co-Authored-By` trailer.
 
 Squash:
 ```
 git reset --soft <base-commit> && git commit
 ```
+
+Then bring the Active Focus in `CLAUDE.local.md` up to date: it may describe the checkpoints just collapsed.
 
 If the final diff does not satisfy the Compression Principle and Universal Code Style — if there are lines you would challenge in code review, then you are not done.
 

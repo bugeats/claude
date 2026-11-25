@@ -43,13 +43,13 @@ Repeat until HEAD sits on `<base>` with at most one commit above it:
    - <descriptive bullet points (exempt from the evergreen rule)>
    ```
 
-   Keep the summary under 72 characters so GitHub does not truncate it in lists.
+   Keep the summary under 72 characters so GitHub does not truncate it in lists. Closing lines that cite registry tasks merge into one.
 
    ```
    git reset --soft <base> && git commit
    ```
 
-Verify with `git log --oneline <base>..HEAD`.
+Verify with `git log --oneline <base>..HEAD`, then bring the Active Focus in `CLAUDE.local.md` up to date with the history as it now stands.
 
 ## Report
 

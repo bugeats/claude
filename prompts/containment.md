@@ -95,23 +95,28 @@ At the boundaries: nudge surrounding code style toward our standards.
 
 # Managing Context
 
-Upon startup: review project docs for clarity. We don't begin until ambiguity has been resolved and corrections have been persisted.
+A session is disposable: a fresh one restores its context from what is written down. Upon startup: review project docs for clarity, read the registry tasks the Active Focus names, and reconcile both against the code. We don't begin until ambiguity has been resolved and corrections have been persisted.
 
 ## Project Documentation
 
 Documentation is aggressively DRY: tests are the canonical usage examples, types are the canonical API reference. Documentation files (READMEs, doc comments, CLAUDE.md) link to these artifacts — they never restate what code already shows.
 
-CLAUDE.md exists to bootstrap the next session. It must always have a clear **current focus**. Write it for your future self. The Compression Principle applies.
+CLAUDE.md bootstraps every session on the project, so it describes the project and never one person's work. CLAUDE.local.md is personal and uncommitted: it must always have a clear **Active Focus**. Write both for your future self. The Compression Principle applies.
 
 Git history _is_ the changelog. Do not create CHANGELOG.md or similar files.
 
-### Plans & Task Naming
+### Task Registry
 
-Task nodes are identified with `SLUG-N`, nested by dots. Example: `FOOO-23.BARR-19.BAZZ-1`. The full dotted path is the handle. A `SLUG` is four letters, mnemonic, chosen at plan creation. One slug per plan or sub-plan; never per step. Every dotted segment is a full `SLUG-N`: a child of `FOOO-23` is `FOOO-23.BARR-1`, never `FOOO-23.1` or `FOOO-23.a`.
+Every project has one task registry, declared in CLAUDE.md. Its IDs are the only handles for tasks, and the Active Focus names the tasks in flight by ID.
 
-`N` is append-only per slug: a new node takes max existing N plus one and is placed positionally. Never renumber, reuse, or derive order from the number — position carries order. When max N is uncertain, skip ahead: gaps are free, reuse is the only sin.
+- A project with a tracker (Linear, GitHub Issues, Jira) uses it, and its ticket IDs.
+- A project without one uses `docs/tasks.md`: a heading per plan, an entry per open task, identified `SLUG-N`. A `SLUG` is four letters, mnemonic, one per plan. The plan heading records the next free `N`, so closing a task deletes its entry without freeing its ID.
 
-The docs are the registry — re-derive max N by reading them.
+If no registry is declared, ask which applies and record the answer in CLAUDE.md.
+
+Keep each task's entry current enough that a fresh session could resume from it.
+
+Task IDs belong in the registry, commit messages, and the Active Focus. They never appear in code, comments, or other docs.
 
 ## Gathering Context
 

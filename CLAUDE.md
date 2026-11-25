@@ -6,6 +6,8 @@ This is a shared distribution used by teammates and a growing circle of users. C
 
 **Everything the plugin says to the model is opt-in.** Guidance ships as two output styles selected in `/config`: `arcs:manual` carries the Compression Principle, the working contract, and context guidance; `arcs:auto` adds the arc workflow and its automatic triggers. With no style selected the session is vanilla Claude Code with the arcs skills available but never self-invoked. Claude Code keys plugin styles as `<plugin>:<name>`, so every self-invocation in `prompts/` and the skill bodies uses the `arcs:` prefix.
 
+Task registry: [docs/tasks.md](docs/tasks.md).
+
 This file is project instructions for *this repo only*. The shipped prose lives in `prompts/`, and tightening it is fair game at any checkpoint.
 
 ## Architecture
@@ -44,20 +46,4 @@ Language-specific style is tiered by cost-of-late-detection: mechanical rules â†
 
 The statusline gauge, the `/negentropy` rebase, `/unwip` (via `--wip`), and `/consolidate` (via `--mainline`) share `tools/checkpoint-range.sh` so they never disagree about what counts as unshared history. `statusline.py` always exits 0 and logs tracebacks to `~/.claude/statusline.log`, because Claude Code suppresses the status line after repeated failures.
 
-## Current Focus
-
-**OPTN â€” opt-in via output styles.** Interactive and headless selection are confirmed.
-
-- **OPTN-5** Mid-session style switching: an `outputStyle` settings change does not rebuild the system prompt within a turn. Whether it applies on the next user turn or only after `/clear` is unknown; record the answer in docs/launcher.md once observed.
-
-Still unverified on a fresh `nix run --refresh`: statusline rendering and skill resolution under `${CLAUDE_PLUGIN_ROOT}`.
-
-## Open Items
-
-- **Consolidate loop untested**: `/consolidate` has not run against mixed checkpoints and crystallized commits, nor via `/shipit` Phase 4, where negentropy would rewrite code on the PR branch.
-- **Stack flow untested**: `/shipit` stack detection, `gh stack link`, and the post-ship reset-sync have not run against a real stacked PR.
-- **Bare skill names**: whether `/checkpoint` resolves to the plugin skill in the TUI, and what wins when a user-scope skill shares the name, is unverified.
-- **rust-analyzer is a removal candidate**: registered unconditionally, referenced by no guidance, never observed in use. Drop the MCP config, its flake inputs, and the `docs/dependencies.md` entry together.
-- **Permission rule semantics**: `Bash(nix:*)` matches `nix` subcommands but not hyphenated binaries like `nix-prefetch-github`.
-- **System flake integration**: consuming `packages.default` from another flake is untested.
-- **Color tuning**: brand purple `#B388FF` is approximate; verify against Claude Code TUI source if possible.
+Tasks live in one registry per project, declared in CLAUDE.md rather than detected: a tracker connector is scoped to an account, not a project, so its presence says nothing about the repo at hand. A tracker's own ticket IDs are the handles, so the plugin never runs an ID scheme beside an organization's; `docs/tasks.md` is the fallback for projects without one. Task IDs are barred from code and other docs because they litter. Personal focus sits in an ignored `CLAUDE.local.md` so a shared `CLAUDE.md` never churns with one person's work, and the registry is the shared half it points into. No tracker write policy is prescribed: the pattern is left to emerge from use.

@@ -25,15 +25,15 @@ List `${CLAUDE_PLUGIN_ROOT}/style/` and, for each language present in the Workin
 
 ## Step 2 — Persist Context
 
-Rewrite the project-level CLAUDE.md for the next session, check for accuracy and make corrections. Ensure there is a "Current Focus" section at the end of the project CLAUDE.md and that it is written to reflect where work stands after this checkpoint.
+Two files bootstrap the next session, and they have different owners.
 
-Purge sections no longer relevant to active work:
+The project-level `CLAUDE.md` is shared: it describes the project to every teammate's session and never carries one person's work. Check it for accuracy and make corrections. Move each section that serves only finished work to `docs/<kebab-case-name>.md`, optionally leaving a link in its place.
 
-1. Identify sections that don't serve the Current Focus.
-2. Move each to `docs/<kebab-case-name>.md`.
-3. Optional: replace sections with a link to the new file.
+`CLAUDE.local.md`, beside it, is personal and never committed: if `git check-ignore -q CLAUDE.local.md` fails, add it to `.gitignore`. Ensure it holds an "Active Focus" section that names the branch it was written on and reflects where work stands after this checkpoint. A focus section found in `CLAUDE.md` moves here.
 
-Items in the Current Focus that are resolved or completed should be purged. Focus is about reducing noise.
+When `CLAUDE.md` declares a task registry, the Active Focus names its tasks by registry ID and the registry holds their detail. Bring those entries up to date, so a fresh session can resume from them.
+
+Items in the Active Focus that are resolved or completed should be purged. Focus is about reducing noise.
 
 ## Step 3 — Persist History
 
@@ -51,7 +51,7 @@ Boundary: <every Element directly modified (certain changed nodes)>
 
 Frontier: <every unmodified Element and its containing module that was read from, depended on, or observed as adjacent to changes (edges traversed)>
 
-Context: <current task and what triggered this checkpoint>
+Context: <current task, by registry ID when a registry is declared, and what triggered this checkpoint>
 ```
 
 Omit the `Co-Authored-By` trailer.
